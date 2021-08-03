@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit-element';
 import classNames from 'classnames';
 import {createReducer, createAction} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
+import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 
 
 const [SET_CARD_URLS, setCardUrls] = createAction('SET_CARD_URLS');
@@ -35,7 +36,7 @@ export class CardLinker extends LitElement {
       }
 
       .card-linker__container--open {
-        display: initial;
+        display: flex;
       }
 
       .card-linker__container--bottom {
@@ -50,7 +51,11 @@ export class CardLinker extends LitElement {
         transform: translateX(-100%);
       }
 
-      .card-linker__img {
+      .card-linker__container--wide {
+        width: 446px;
+      }
+
+      .card-linker__image {
         display: block;
         max-width: 100%;
       }
@@ -63,7 +68,7 @@ export class CardLinker extends LitElement {
     const searchTerm = this.getAttribute('name') || this.textContent;
 
     this.state = {
-      imageUrl: undefined,
+      images: [],
       scryfallUrl: `https://scryfall.com/search?q="${encodeURIComponent(searchTerm)}"`,
       fetched: false,
       display: false,
@@ -76,7 +81,7 @@ export class CardLinker extends LitElement {
     const reducer = createReducer({...this.state}, {
       [SET_CARD_URLS]: (state, action) => ({
         ...state,
-        imageUrl: action.value.image,
+        images: action.value.images,
         scryfallUrl: action.value.scryfall,
       }),
       [SET_FETCHED]: state => ({
@@ -138,7 +143,9 @@ export class CardLinker extends LitElement {
         .then(resp => resp.json())
         .then(resp => {
           const urls = {
-            image: resp.image_uris.normal,
+            images: DOUBLE_SIDED_LAYOUTS.includes(resp.layout) ?
+              resp.card_faces.map(face => face.image_uris.normal) :
+              [resp.image_uris.normal],
             scryfall: resp.scryfall_uri,
           };
 
@@ -188,10 +195,11 @@ export class CardLinker extends LitElement {
 
   render() {
     const containerClasses = classNames('card-linker__container', {
-      'card-linker__container--open': this.state.display && !!this.state.imageUrl,
+      'card-linker__container--open': this.state.display && !!this.state.images.length,
       'card-linker__container--bottom': this.state.bottom,
       'card-linker__container--top': !this.state.bottom,
       'card-linker__container--left': !this.state.right,
+      'card-linker__container--wide': this.state.images.length > 1,
     });
 
     return html`
@@ -204,7 +212,7 @@ export class CardLinker extends LitElement {
         @mouseleave=${this.mouseleave}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX};'>
-          <img class='card-linker__img' part='image' src='${this.state.imageUrl}' />
+          ${this.state.images.map(image => html`<img class='card-linker__image' part='image' src='${image}' />`)}
         </div>
       </a>
     `;
