@@ -17,14 +17,6 @@ export class CardLinker extends LitElement {
       name: {
         type: String,
       },
-      linkClass: {
-        type: String,
-        attribute: 'link-class',
-      },
-      cardClass: {
-        type: String,
-        attribute: 'card-class',
-      },
     };
   }
 
@@ -39,9 +31,27 @@ export class CardLinker extends LitElement {
         position: absolute;
         width: 223px;
         height: 310px;
+        display: none;
+      }
+
+      .card-linker__container--open {
+        display: initial;
+      }
+
+      .card-linker__container--bottom {
+        top: 100%;
+      }
+
+      .card-linker__container--top {
+        bottom: 100%;
+      }
+
+      .card-linker__container--left {
+        transform: translateX(-100%);
       }
 
       .card-linker__img {
+        display: block;
         max-width: 100%;
       }
     `;
@@ -58,6 +68,8 @@ export class CardLinker extends LitElement {
       fetched: false,
       display: false,
       cardX: 0,
+      bottom: true,
+      right: true,
       searchTerm,
     };
 
@@ -80,6 +92,8 @@ export class CardLinker extends LitElement {
         ...state,
         display: action.value.display,
         cardX: action.value.cardX,
+        bottom: action.value.bottom,
+        right: action.value.right,
       }),
       [HIDE_CARD]: state => ({
         ...state,
@@ -138,10 +152,12 @@ export class CardLinker extends LitElement {
     this.dispatch(setFetched());
   }
 
-  displayCard(cardX, cardY) {
+  displayCard(cardX, bottom = true, right = true) {
     this.dispatch(updateDisplay({
       display: true,
       cardX,
+      bottom,
+      right,
     }));
     this.emitEvent('displayCard');
   }
@@ -152,12 +168,18 @@ export class CardLinker extends LitElement {
   }
 
   mouseenter(e) {
+    const OFFSET = 8;
     const bounds = this.getBoundingClientRect();
     const mouseX = e.clientX - bounds.left;
-    const mouseY = e.clientY - bounds.top;
+
+    const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-linker__container'));
+    const width = containerStyles.getPropertyValue('width');
+    const height = containerStyles.getPropertyValue('height');
+    const overflowRight = e.clientX + parseInt(width) > window.innerWidth;
+    const overflowBottom = e.clientY + parseInt(height) > window.innerHeight;
 
     this.fetchCard();
-    this.displayCard(mouseX, mouseY);
+    this.displayCard(mouseX + (overflowRight ? OFFSET : -OFFSET), !overflowBottom, !overflowRight);
   }
 
   mouseleave() {
@@ -165,18 +187,25 @@ export class CardLinker extends LitElement {
   }
 
   render() {
+    const containerClasses = classNames('card-linker__container', {
+      'card-linker__container--open': this.state.display && !!this.state.imageUrl,
+      'card-linker__container--bottom': this.state.bottom,
+      'card-linker__container--top': !this.state.bottom,
+      'card-linker__container--left': !this.state.right,
+    });
+
     return html`
       <a href=${this.state.scryfallUrl}
         target='_blank'
         rel='nofollow noreferrer noopener'
-        class=${classNames('card-linker__link', this.linkClass)}
+        class='card-linker__link'
+        part='link'
         @mouseenter=${this.mouseenter}
         @mouseleave=${this.mouseleave}>
         <slot></slot>
-        ${this.state.display && !!this.state.imageUrl ?
-          html`<div class=${classNames('card-linker__container', this.cardClass)} style='left: ${this.state.cardX};'>
-            <img class='card-linker__img' src='${this.state.imageUrl}' />
-          </div>` : null}
+        <div class=${containerClasses} part='container' style='left: ${this.state.cardX};'>
+          <img class='card-linker__img' part='image' src='${this.state.imageUrl}' />
+        </div>
       </a>
     `;
   }

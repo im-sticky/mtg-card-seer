@@ -10,23 +10,40 @@
         padding: 0;
       }
 
+      * {
+        box-sizing: border-box;
+      }
+
       .test-content {
         display: flex;
         flex-direction: column;
         padding: 24px;
+        height: 100%;
       }
 
       .test-content > card-linker {
         margin-bottom: 16px;
       }
 
-      .additional-card-class {
-
-      }
-
-      .additional-link {
+      .styled::part(link) {
         color: red;
         text-decoration: none;
+      }
+
+      .styled::part(container) {
+        width: 88px;
+      }
+
+      .styled::part(image) {
+        transform: rotate(90deg);
+      }
+
+      .right {
+        margin-left: auto;
+      }
+
+      .bottom {
+        margin-top: auto;
       }
     </style>
   </head>
@@ -34,14 +51,17 @@
   <body>
     <div class="test-content">
       <card-linker id="elspeth">elspeth's nightmare</card-linker>
-      <card-linker name="lightning bolt">bolt</card-linker>
-      <card-linker name="lightning bolt" link-class="additional-link" card-class="additional-card">bolt</card-linker>
+      <card-linker id="rename" name="lightning bolt">bolt</card-linker>
+      <card-linker class="styled" name="lightning bolt">bolt</card-linker>
+      <card-linker>Claim // Fame</card-linker>
+      <card-linker class="right">Stoneforge Mystic</card-linker>
+      <card-linker class="bottom right">Batterskull</card-linker>
     </div>
 
 
     <script type="text/javascript">
       setTimeout(() => {
-        document.querySelector('card-linker[name="lightning bolt"]').setAttribute('name', 'Demon Bolt');
+        document.querySelector('#rename').setAttribute('name', 'Demon Bolt');
         console.log('update name prop from "lightning bolt" to "Demon Bolt"');
       }, 2000);
 
