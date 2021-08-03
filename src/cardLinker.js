@@ -7,7 +7,7 @@ import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 
 const [SET_CARD_URLS, setCardUrls] = createAction('SET_CARD_URLS');
 const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
-const [UPDATE_SEARCH_TERM, updateSearchTerm] = createAction('UPDATE_SEARCH_TERM');
+const [UPDATE_SEARCH, updateSearch] = createAction('UPDATE_SEARCH');
 const [UPDATE_DISPLAY, updateDisplay] = createAction('UPDATE_DISPLAY');
 const [HIDE_CARD, hideCard] = createAction('HIDE_CARD');
 
@@ -16,6 +16,9 @@ export class CardLinker extends LitElement {
   static get properties() {
     return { 
       name: {
+        type: String,
+      },
+      set: {
         type: String,
       },
     };
@@ -66,6 +69,7 @@ export class CardLinker extends LitElement {
     super();
 
     const searchTerm = this.getAttribute('name') || this.textContent;
+    const searchSet = this.getAttribute('set');
 
     this.state = {
       images: [],
@@ -75,7 +79,10 @@ export class CardLinker extends LitElement {
       cardX: 0,
       bottom: true,
       right: true,
-      searchTerm,
+      search: {
+        fuzzy: searchTerm,
+        set: searchSet,
+      },
     };
 
     const reducer = createReducer({...this.state}, {
@@ -88,10 +95,10 @@ export class CardLinker extends LitElement {
         ...state,
         fetched: true,
       }),
-      [UPDATE_SEARCH_TERM]: (state, action) => ({
+      [UPDATE_SEARCH]: (state, action) => ({
         ...state,
-        searchTerm: action.value,
-        fetched: CardCache.has(action.value),
+        search: {...action.value},
+        fetched: false,
       }),
       [UPDATE_DISPLAY]: (state, action) => ({
         ...state,
@@ -117,8 +124,20 @@ export class CardLinker extends LitElement {
   }
 
   set name(newVal) {
-    if (newVal !== this.state.searchTerm) {
-      this.dispatch(updateSearchTerm(newVal));
+    if (newVal !== this.state.search.fuzzy) {
+      this.dispatch(updateSearch({
+        ...this.state.search,
+        fuzzy: newVal,
+      }));
+    }
+  }
+
+  set set(newVal) {
+    if (newVal !== this.state.search.set) {
+      this.dispatch(updateSearch({
+        ...this.state.search,
+        set: newVal,
+      }));
     }
   }
 
@@ -134,12 +153,20 @@ export class CardLinker extends LitElement {
       return;
     }
 
-    if (CardCache.has(this.state.searchTerm)) {
-      const urls = CardCache.get(this.state.searchTerm);
+    if (CardCache.has(this.state.search)) {
+      const urls = CardCache.get(this.state.search);
 
       this.dispatch(setCardUrls(urls));
     } else {
-      fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(this.state.searchTerm)}`)
+      const searchParams = new URLSearchParams();
+      
+      Object.keys(this.state.search).forEach(key => {
+        if (this.state.search[key]) {
+          searchParams.set(key, this.state.search[key]);
+        }
+      });
+
+      fetch(`https://api.scryfall.com/cards/named?${searchParams.toString()}`)
         .then(resp => resp.json())
         .then(resp => {
           const urls = {
@@ -149,7 +176,7 @@ export class CardLinker extends LitElement {
             scryfall: resp.scryfall_uri,
           };
 
-          CardCache.set(this.state.searchTerm, urls);
+          CardCache.set(this.state.search, urls);
 
           this.dispatch(setCardUrls(urls));
           this.emitEvent('fetchCard');
