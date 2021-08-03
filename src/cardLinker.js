@@ -169,6 +169,12 @@ export class CardLinker extends LitElement {
       fetch(`https://api.scryfall.com/cards/named?${searchParams.toString()}`)
         .then(resp => resp.json())
         .then(resp => {
+          if (resp.status === 404) {
+            console.error(resp.details);
+
+            return;
+          }
+
           const urls = {
             images: DOUBLE_SIDED_LAYOUTS.includes(resp.layout) ?
               resp.card_faces.map(face => face.image_uris.normal) :
