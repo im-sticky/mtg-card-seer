@@ -1,8 +1,8 @@
 {
   "name": "mtg-card-seer",
   "version": "1.0.0",
-  "description": "An HTML web component that uses the Scryfall API to display MTG card images automatically on hover.",
-  "main": "src/index.js",
+  "description": "Web Components for previewing MTG card images automatically",
+  "main": "dist/main.bundle.js",
   "scripts": {
     "start": "webpack serve --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"

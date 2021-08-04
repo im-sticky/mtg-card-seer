@@ -248,7 +248,7 @@ export class CardLink extends LitElement {
         @mouseenter=${this.mouseenter}
         @mouseleave=${this.mouseleave}>
         <slot></slot>
-        <div class=${containerClasses} part='container' style='left: ${this.state.cardX};'>
+        <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px;'>
           ${this.state.images.map(image => html`<img class='card-link__image' part='image' src='${image}' />`)}
         </div>
       </a>
