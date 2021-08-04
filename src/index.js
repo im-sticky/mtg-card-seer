@@ -1,3 +1,3 @@
-import {CardLinker} from './cardLinker';
+import {CardLink} from './cardLink';
 
-customElements.define('card-linker', CardLinker);
+customElements.define('card-link', CardLink);

@@ -12,7 +12,7 @@ const [UPDATE_DISPLAY, updateDisplay] = createAction('UPDATE_DISPLAY');
 const [HIDE_CARD, hideCard] = createAction('HIDE_CARD');
 
 
-export class CardLinker extends LitElement {
+export class CardLink extends LitElement {
   static get properties() {
     return { 
       name: {
@@ -26,11 +26,11 @@ export class CardLinker extends LitElement {
 
   static get styles() {
     return css`
-      .card-linker__link {
+      .card-link__link {
         position: relative;
       }
 
-      .card-linker__container {
+      .card-link__container {
         z-index: 99;
         position: absolute;
         width: 223px;
@@ -38,27 +38,27 @@ export class CardLinker extends LitElement {
         display: none;
       }
 
-      .card-linker__container--open {
+      .card-link__container--open {
         display: flex;
       }
 
-      .card-linker__container--bottom {
+      .card-link__container--bottom {
         top: 100%;
       }
 
-      .card-linker__container--top {
+      .card-link__container--top {
         bottom: 100%;
       }
 
-      .card-linker__container--left {
+      .card-link__container--left {
         transform: translateX(-100%);
       }
 
-      .card-linker__container--wide {
+      .card-link__container--wide {
         width: 446px;
       }
 
-      .card-linker__image {
+      .card-link__image {
         display: block;
         max-width: 100%;
       }
@@ -113,9 +113,14 @@ export class CardLinker extends LitElement {
       })
     });
 
-    this.dispatch = action => {
+    // TODO: move into a base class
+    this.dispatch = (action, callback) => {
       this.state = reducer(this.state, action);
-      this.requestUpdate();
+      this.requestUpdate().then(updated => {
+        if (updated && !!callback && typeof callback === 'function') {
+          callback();
+        }
+      });
     };
   }
 
@@ -171,6 +176,7 @@ export class CardLinker extends LitElement {
         .then(resp => {
           if (resp.status === 404) {
             console.error(resp.details);
+            this.emitEvent('fetchError');
 
             return;
           }
@@ -198,13 +204,11 @@ export class CardLinker extends LitElement {
       cardX,
       bottom,
       right,
-    }));
-    this.emitEvent('displayCard');
+    }), () => this.emitEvent('displayCard'));
   }
 
   hideCard() {
-    this.dispatch(hideCard());
-    this.emitEvent('hideCard');
+    this.dispatch(hideCard(), () => this.emitEvent('hideCard'));
   }
 
   mouseenter(e) {
@@ -212,7 +216,7 @@ export class CardLinker extends LitElement {
     const bounds = this.getBoundingClientRect();
     const mouseX = e.clientX - bounds.left;
 
-    const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-linker__container'));
+    const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
     const width = containerStyles.getPropertyValue('width');
     const height = containerStyles.getPropertyValue('height');
     const overflowRight = e.clientX + parseInt(width) > window.innerWidth;
@@ -227,25 +231,25 @@ export class CardLinker extends LitElement {
   }
 
   render() {
-    const containerClasses = classNames('card-linker__container', {
-      'card-linker__container--open': this.state.display && !!this.state.images.length,
-      'card-linker__container--bottom': this.state.bottom,
-      'card-linker__container--top': !this.state.bottom,
-      'card-linker__container--left': !this.state.right,
-      'card-linker__container--wide': this.state.images.length > 1,
+    const containerClasses = classNames('card-link__container', {
+      'card-link__container--open': this.state.display && !!this.state.images.length,
+      'card-link__container--bottom': this.state.bottom,
+      'card-link__container--top': !this.state.bottom,
+      'card-link__container--left': !this.state.right,
+      'card-link__container--wide': this.state.images.length > 1,
     });
 
     return html`
       <a href=${this.state.scryfallUrl}
         target='_blank'
         rel='nofollow noreferrer noopener'
-        class='card-linker__link'
+        class='card-link__link'
         part='link'
         @mouseenter=${this.mouseenter}
         @mouseleave=${this.mouseleave}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX};'>
-          ${this.state.images.map(image => html`<img class='card-linker__image' part='image' src='${image}' />`)}
+          ${this.state.images.map(image => html`<img class='card-link__image' part='image' src='${image}' />`)}
         </div>
       </a>
     `;
