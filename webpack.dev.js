@@ -13,7 +13,7 @@ module.exports = merge(common, {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: 'MTG Card Linker',
+      title: 'MTG Card Seer',
       template: 'example/index.html',
       minify: {
         removeRedundantAttributes: true,

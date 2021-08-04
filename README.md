@@ -1,6 +1,6 @@
 # MTG Card Seer
 
-A set of HTML Web Components that use the [Scryfall API](https://scryfall.com/) to display MTG card images automatically on hover.
+A set of easy to use HTML Web Components that use the [Scryfall API](https://scryfall.com/) to display MTG card images automatically on hover.
 
 ## Basic usage and features
 
@@ -15,7 +15,11 @@ You can read more about specific component APIs below or view more in depth exam
 
 ## Installation
 
+The library is available as a package on npm. Currently there is no static location for a production file to hotlink to.
 
+```
+npm install mtg-card-seer --save
+```
 
 ### Dev setup
 
@@ -88,6 +92,6 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 - [ ] add decklist component
 - [ ] add sideboard cuts/adds component
 
-Discovered a bug? Log it [here](https://github.com/im-sticky/mtg-card-linker/issues) with browser details and steps to replicate it.
+Discovered a bug? Log it [here](https://github.com/im-sticky/mtg-card-seer/issues) with browser details and steps to replicate it.
 
-Have an idea for a feature? Recommend it [here](https://github.com/im-sticky/mtg-card-linker/issues).
+Have an idea for a feature? Recommend it [here](https://github.com/im-sticky/mtg-card-seer/issues).
