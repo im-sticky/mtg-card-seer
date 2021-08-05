@@ -21,6 +21,9 @@ export class CardLink extends LitElement {
       set: {
         type: String,
       },
+      collector: {
+        type: Number,
+      },
     };
   }
 
@@ -69,7 +72,6 @@ export class CardLink extends LitElement {
     super();
 
     const searchTerm = this.getAttribute('name') || this.textContent;
-    const searchSet = this.getAttribute('set');
 
     this.state = {
       images: [],
@@ -81,7 +83,8 @@ export class CardLink extends LitElement {
       right: true,
       search: {
         fuzzy: searchTerm,
-        set: searchSet,
+        set: this.getAttribute('set'),
+        collector: this.getAttribute('collector'),
       },
     };
 
@@ -146,6 +149,17 @@ export class CardLink extends LitElement {
     }
   }
 
+  set collector(newVal) {
+    if (newVal !== this.state.search.collector) {
+      this.dispatch(updateSearch({
+        ...this.state.search,
+        collector: newVal,
+      }));
+    }
+  }
+
+  apiRoot = 'https://api.scryfall.com/';
+
   emitEvent(eventName, initOptions) {
     this.dispatchEvent(new Event(eventName, Object.assign({
       bubbles: true,
@@ -163,15 +177,23 @@ export class CardLink extends LitElement {
 
       this.dispatch(setCardUrls(urls));
     } else {
-      const searchParams = new URLSearchParams();
-      
-      Object.keys(this.state.search).forEach(key => {
-        if (this.state.search[key]) {
-          searchParams.set(key, this.state.search[key]);
-        }
-      });
+      let endpoint = 'cards/';
 
-      fetch(`https://api.scryfall.com/cards/named?${searchParams.toString()}`)
+      if (this.state.search.set && this.state.search.collector) {
+        endpoint += `${this.state.search.set}/${this.state.search.collector}`;
+      } else {
+        const searchParams = new URLSearchParams();
+      
+        Object.keys(this.state.search).forEach(key => {
+          if (this.state.search[key]) {
+            searchParams.set(key, this.state.search[key]);
+          }
+        });
+
+        endpoint += `named?${searchParams.toString()}`;
+      }
+
+      fetch(`${this.apiRoot}${endpoint}`)
         .then(resp => resp.json())
         .then(resp => {
           if (resp.status === 404) {

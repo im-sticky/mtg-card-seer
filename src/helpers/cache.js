@@ -3,8 +3,9 @@ const _cache = new Map();
 export class CardCache {
   static normalizeKey(searchObj) {
     const setKey = searchObj.set ? `-${searchObj.set.trim().toLowerCase()}` : '';
+    const collectorNum = searchObj.collector ? `-${searchObj.collector}` : '';
 
-    return searchObj.fuzzy.trim().toLowerCase().replace(/ /g, '_') + setKey;
+    return searchObj.fuzzy.trim().toLowerCase().replace(/ /g, '_') + setKey + collectorNum;
   }
 
   static set(searchObj, value) {
