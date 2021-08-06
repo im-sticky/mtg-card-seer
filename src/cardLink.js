@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import {createReducer, createAction} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
 import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
+import {SearchModel} from 'models/search';
 
 
 const [SET_CARD_URLS, setCardUrls] = createAction('SET_CARD_URLS');
@@ -11,6 +12,7 @@ const [UPDATE_SEARCH, updateSearch] = createAction('UPDATE_SEARCH');
 const [UPDATE_DISPLAY, updateDisplay] = createAction('UPDATE_DISPLAY');
 const [HIDE_CARD, hideCard] = createAction('HIDE_CARD');
 
+const CARD_WIDTH = 223;
 
 export class CardLink extends LitElement {
   static get properties() {
@@ -36,7 +38,7 @@ export class CardLink extends LitElement {
       .card-link__container {
         z-index: 99;
         position: fixed;
-        width: 223px;
+        width: ${CARD_WIDTH}px;
         height: 310px;
         display: none;
       }
@@ -66,7 +68,7 @@ export class CardLink extends LitElement {
       }
 
       .card-link__container--wide {
-        width: 446px;
+        width: ${CARD_WIDTH * 2}px;
       }
 
       .card-link__image {
@@ -90,11 +92,11 @@ export class CardLink extends LitElement {
       cardY: 0,
       bottom: true,
       right: true,
-      search: {
+      search: new SearchModel({
         fuzzy: searchTerm,
         set: this.getAttribute('set'),
         collector: this.getAttribute('collector'),
-      },
+      }),
     };
 
     const reducer = createReducer({...this.state}, {
@@ -109,7 +111,7 @@ export class CardLink extends LitElement {
       }),
       [UPDATE_SEARCH]: (state, action) => ({
         ...state,
-        search: {...action.value},
+        search: new SearchModel({...action.value}),
         fetched: false,
       }),
       [UPDATE_DISPLAY]: (state, action) => ({

@@ -1,22 +1,15 @@
 const _cache = new Map();
 
 export class CardCache {
-  static normalizeKey(searchObj) {
-    const setKey = searchObj.set ? `-${searchObj.set.trim().toLowerCase()}` : '';
-    const collectorNum = searchObj.collector ? `-${searchObj.collector}` : '';
-
-    return searchObj.fuzzy.trim().toLowerCase().replace(/ /g, '_') + setKey + collectorNum;
+  static set(search, value) {
+    _cache.set(search.cacheKey, value);
   }
 
-  static set(searchObj, value) {
-    _cache.set(this.normalizeKey(searchObj), value);
+  static get(search) {
+    return _cache.get(search.cacheKey);
   }
 
-  static get(searchObj) {
-    return _cache.get(this.normalizeKey(searchObj));
-  }
-
-  static has(searchObj) {
-    return _cache.has(this.normalizeKey(searchObj));
+  static has(search) {
+    return _cache.has(search.cacheKey);
   }
 }
