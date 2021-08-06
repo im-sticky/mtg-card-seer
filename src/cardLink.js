@@ -35,7 +35,7 @@ export class CardLink extends LitElement {
 
       .card-link__container {
         z-index: 99;
-        position: absolute;
+        position: fixed;
         width: 223px;
         height: 310px;
         display: none;
@@ -46,15 +46,23 @@ export class CardLink extends LitElement {
       }
 
       .card-link__container--bottom {
-        top: 100%;
+        transform: translateY(-1px);
       }
 
       .card-link__container--top {
-        bottom: 100%;
+        transform: translateY(-100%);
       }
 
       .card-link__container--left {
         transform: translateX(-100%);
+      }
+
+      .card-link__container--top.card-link__container--left {
+        transform: translate3d(-100%, -100%, 0);
+      }
+
+      .card-link__container--bottom.card-link__container--left {
+        transform: translate3d(-100%, -1px, 0);
       }
 
       .card-link__container--wide {
@@ -79,6 +87,7 @@ export class CardLink extends LitElement {
       fetched: false,
       display: false,
       cardX: 0,
+      cardY: 0,
       bottom: true,
       right: true,
       search: {
@@ -107,6 +116,7 @@ export class CardLink extends LitElement {
         ...state,
         display: action.value.display,
         cardX: action.value.cardX,
+        cardY: action.value.cardY,
         bottom: action.value.bottom,
         right: action.value.right,
       }),
@@ -220,10 +230,11 @@ export class CardLink extends LitElement {
     this.dispatch(setFetched());
   }
 
-  displayCard(cardX, bottom = true, right = true) {
+  displayCard(cardX, cardY, bottom = true, right = true) {
     this.dispatch(updateDisplay({
       display: true,
       cardX,
+      cardY,
       bottom,
       right,
     }), () => this.emitEvent('displayCard'));
@@ -233,22 +244,35 @@ export class CardLink extends LitElement {
     this.dispatch(hideCard(), () => this.emitEvent('hideCard'));
   }
 
-  mouseenter(e) {
+  mouseEnterEvent(e) {
     const OFFSET = 8;
-    const bounds = this.getBoundingClientRect();
-    const mouseX = e.clientX - bounds.left;
-
     const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
     const width = containerStyles.getPropertyValue('width');
     const height = containerStyles.getPropertyValue('height');
     const overflowRight = e.clientX + parseInt(width) > window.innerWidth;
     const overflowBottom = e.clientY + parseInt(height) > window.innerHeight;
+    let clientY;
+
+    Array.prototype.slice.call(this.getClientRects()).some(rect => {
+      if (e.clientY >= Math.round(rect.top) &&
+          e.clientY <= Math.round(rect.bottom) &&
+          e.clientX >= Math.round(rect.left) &&
+          e.clientX <= Math.round(rect.right)) {
+        clientY = rect.top + (overflowBottom ? 0 : rect.height);
+        return true;
+      }
+    });
 
     this.fetchCard();
-    this.displayCard(mouseX + (overflowRight ? OFFSET : -OFFSET), !overflowBottom, !overflowRight);
+    this.displayCard(
+      e.clientX + (overflowRight ? OFFSET : -OFFSET),
+      clientY,
+      !overflowBottom,
+      !overflowRight
+    );
   }
 
-  mouseleave() {
+  mouseLeaveEvent(e) {
     this.hideCard();
   }
 
@@ -267,10 +291,11 @@ export class CardLink extends LitElement {
         rel='nofollow noreferrer noopener'
         class='card-link__link'
         part='link'
-        @mouseenter=${this.mouseenter}
-        @mouseleave=${this.mouseleave}>
+        @mouseenter=${this.mouseEnterEvent}
+        @mouseleave=${this.mouseLeaveEvent}
+        @mousemove=${this.mouseMoveEvent}>
         <slot></slot>
-        <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px;'>
+        <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
           ${this.state.images.map(image => html`<img class='card-link__image' part='image' src='${image}' />`)}
         </div>
       </a>
