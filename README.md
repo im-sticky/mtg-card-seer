@@ -50,16 +50,17 @@ Find each component with what attributes and events are available to them here. 
 
 #### Attributes
 
-HTML attributes that can be used to specify information to the component directly. Example:
+HTML attributes that can be used to specify information to the component directly. All are optional. Example:
 ```html
 <card-link name="lightning bolt">bolt</card-link>
 ```
 
-| Attribute | Description |
-|---|---|
-| name | Specifies the fuzzy search term. Has priority in being used over text directly specified in the component. |
-| set | The 3-5 letter magic set code to search within. Sets and their codes can be found [here](https://scryfall.com/sets). |
-| collector | The specific collector number of the card to find. the `set` attribute is required if using this. |
+| Attribute | Type | Description |
+|---|---|---|
+| name | String | Specifies the fuzzy search term. Has priority in being used over text directly specified in the component. |
+| set | String | The 3-5 letter magic set code to search within. Sets and their codes can be found [here](https://scryfall.com/sets). |
+| collector | Number | The specific collector number of the card to find. the `set` attribute is required if using this. |
+| face | Number | Specific card image to show for double sided cards. 1 is front and 2 is back. |
 
 #### Events
 
@@ -94,7 +95,7 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 ## Feature roadmap
 
 - [x] ~~add search by collector number to `card-link`~~
-- [ ] add ability to specify card face to display for `card-link`
+- [x] ~~add ability to specify card face to display for `card-link`~~
 - [ ] add optional display for price info to `card-link` preview
 - [ ] add proper mobile support for `card-link`
 - [ ] add a11y preview mode for `card-link`

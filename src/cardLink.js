@@ -26,6 +26,9 @@ export class CardLink extends StateElement {
       collector: {
         type: Number,
       },
+      face: {
+        type: Number,
+      },
     };
   }
 
@@ -263,12 +266,14 @@ export class CardLink extends StateElement {
   }
 
   render() {
+    const displayImages = !this.face ? this.state.images : this.state.images.slice(this.face - 1, this.face);
+
     const containerClasses = classNames('card-link__container', {
       'card-link__container--open': this.state.display && !!this.state.images.length,
       'card-link__container--bottom': this.state.bottom,
       'card-link__container--top': !this.state.bottom,
       'card-link__container--left': !this.state.right,
-      'card-link__container--wide': this.state.images.length > 1,
+      'card-link__container--wide': displayImages.length > 1,
     });
 
     return html`
@@ -278,11 +283,10 @@ export class CardLink extends StateElement {
         class='card-link__link'
         part='link'
         @mouseenter=${this.mouseEnterEvent}
-        @mouseleave=${this.mouseLeaveEvent}
-        @mousemove=${this.mouseMoveEvent}>
+        @mouseleave=${this.mouseLeaveEvent}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
-          ${this.state.images.map(image => html`<img class='card-link__image' part='image' src='${image}' />`)}
+          ${displayImages.map(image => html`<img class='card-link__image' part='image' src='${image}' />`)}
         </div>
       </a>
     `;
