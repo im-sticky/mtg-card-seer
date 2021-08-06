@@ -1,6 +1,6 @@
-import {LitElement, html, css} from 'lit-element';
+import {html, css} from 'lit-element';
 import classNames from 'classnames';
-import {createReducer, createAction} from 'helpers/store';
+import {createReducer, createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
 import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 import {SearchModel} from 'models/search';
@@ -14,7 +14,7 @@ const [HIDE_CARD, hideCard] = createAction('HIDE_CARD');
 
 const CARD_WIDTH = 223;
 
-export class CardLink extends LitElement {
+export class CardLink extends StateElement {
   static get properties() {
     return { 
       name: {
@@ -99,7 +99,7 @@ export class CardLink extends LitElement {
       }),
     };
 
-    const reducer = createReducer({...this.state}, {
+    this.reducer = createReducer({...this.state}, {
       [SET_CARD_URLS]: (state, action) => ({
         ...state,
         images: action.value.images,
@@ -127,20 +127,6 @@ export class CardLink extends LitElement {
         display: false,
       })
     });
-
-    // TODO: move into a base class
-    this.dispatch = (action, callback) => {
-      this.state = reducer(this.state, action);
-      this.requestUpdate().then(updated => {
-        if (updated && !!callback && typeof callback === 'function') {
-          callback();
-        }
-      });
-    };
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
   }
 
   set name(newVal) {
@@ -169,8 +155,6 @@ export class CardLink extends LitElement {
       }));
     }
   }
-
-  apiRoot = 'https://api.scryfall.com/';
 
   emitEvent(eventName, initOptions) {
     this.dispatchEvent(new Event(eventName, Object.assign({
