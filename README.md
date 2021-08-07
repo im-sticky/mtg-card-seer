@@ -61,6 +61,7 @@ HTML attributes that can be used to specify information to the component directl
 | set | String | The 3-5 letter magic set code to search within. Sets and their codes can be found [here](https://scryfall.com/sets). |
 | collector | Number | The specific collector number of the card to find. the `set` attribute is required if using this. |
 | face | Number | Specific card image to show for double sided cards. 1 is front and 2 is back. |
+| price-info | Boolean | Shows any available pricing information and links to purchase sites. |
 
 #### Events
 
@@ -91,12 +92,15 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 | link | \<a\> | The wrapping anchor for the child text and all component's elements. Image will be relative to this. |
 | container | \<div\> | Container element for all children elements that appear in card popup. Positioned based on mouse cursor and parent anchor. |
 | image | \<img\> | The image that is retrieved from Scryfall. May be multiple images for double-faced cards. |
+| price-list | \<ul\> | List container for all of the prices. |
+| price-item | \<li\> | Individual list item for a price. |
+| price-link | \<a\> | Link which contains pricing text. |
 
 ## Feature roadmap
 
 - [x] ~~add search by collector number to `card-link`~~
 - [x] ~~add ability to specify card face to display for `card-link`~~
-- [ ] add optional display for price info to `card-link` preview
+- [x] ~~add optional display for price info to `card-link` preview~~
 - [ ] add proper mobile support for `card-link`
 - [ ] add a11y preview mode for `card-link`
 - [ ] add inline card preview component

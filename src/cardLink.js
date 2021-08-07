@@ -2,11 +2,11 @@ import {html, css} from 'lit-element';
 import classNames from 'classnames';
 import {createReducer, createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
-import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 import {SearchModel} from 'models/search';
+import {CardModel} from 'models/card';
 
 
-const [SET_CARD_URLS, setCardUrls] = createAction('SET_CARD_URLS');
+const [SET_CARD_INFO, setCardInfo] = createAction('SET_CARD_INFO');
 const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 const [UPDATE_SEARCH, updateSearch] = createAction('UPDATE_SEARCH');
 const [UPDATE_DISPLAY, updateDisplay] = createAction('UPDATE_DISPLAY');
@@ -28,6 +28,10 @@ export class CardLink extends StateElement {
       },
       face: {
         type: Number,
+      },
+      priceInfo: {
+        type: Boolean,
+        attribute: 'price-info',
       },
     };
   }
@@ -58,6 +62,7 @@ export class CardLink extends StateElement {
 
       .card-link__container--open {
         display: flex;
+        flex-wrap: wrap;
       }
 
       .card-link__link:hover .card-link__container--open {
@@ -91,6 +96,40 @@ export class CardLink extends StateElement {
       .card-link__image {
         display: block;
         max-width: 100%;
+        height: 100%;
+      }
+
+      .card-link__prices {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        width: 100%;
+        background: #fff;
+      }
+
+      .card-link__price {
+        width: 100%;
+        text-align: center;
+      }
+
+      .card-link__price:first-child {
+        text-align: right;
+      }
+
+      .card-link__price:last-child {
+        text-align: left;
+      }
+
+      .card-link__price > a {
+        display: block;
+        padding: 6px 8px;
+        font-size: 80%;
+        text-decoration: none;
+      }
+
+      .card-link__price > a:hover {
+        text-decoration: underline;
       }
     `;
   }
@@ -101,8 +140,9 @@ export class CardLink extends StateElement {
     const searchTerm = this.getAttribute('name') || this.textContent;
 
     this.state = {
-      images: [],
-      scryfallUrl: `https://scryfall.com/search?q="${encodeURIComponent(searchTerm)}"`,
+      cardInfo: new CardModel({
+        url: `https://scryfall.com/search?q="${encodeURIComponent(searchTerm)}"`,
+      }),
       fetched: false,
       display: false,
       cardX: 0,
@@ -117,10 +157,9 @@ export class CardLink extends StateElement {
     };
 
     this.reducer = createReducer({...this.state}, {
-      [SET_CARD_URLS]: (state, action) => ({
+      [SET_CARD_INFO]: (state, action) => ({
         ...state,
-        images: action.value.images,
-        scryfallUrl: action.value.scryfall,
+        cardInfo: new CardModel({...action.value}),
       }),
       [SET_FETCHED]: state => ({
         ...state,
@@ -186,9 +225,9 @@ export class CardLink extends StateElement {
     }
 
     if (CardCache.has(this.state.search)) {
-      const urls = CardCache.get(this.state.search);
+      const info = CardCache.get(this.state.search);
 
-      this.dispatch(setCardUrls(urls));
+      this.dispatch(setCardInfo(info));
     } else {
       let endpoint = 'cards/';
 
@@ -216,16 +255,11 @@ export class CardLink extends StateElement {
             return;
           }
 
-          const urls = {
-            images: DOUBLE_SIDED_LAYOUTS.includes(resp.layout) ?
-              resp.card_faces.map(face => face.image_uris.normal) :
-              [resp.image_uris.normal],
-            scryfall: resp.scryfall_uri,
-          };
+          const info = CardModel.fromApi(resp);
 
-          CardCache.set(this.state.search, urls);
+          CardCache.set(this.state.search, info);
 
-          this.dispatch(setCardUrls(urls));
+          this.dispatch(setCardInfo(info));
           this.emitEvent('fetchCard');
         });
     }
@@ -279,10 +313,10 @@ export class CardLink extends StateElement {
   }
 
   render() {
-    const displayImages = !this.face ? this.state.images : this.state.images.slice(this.face - 1, this.face);
+    const displayImages = !this.face ? this.state.cardInfo.images : this.state.cardInfo.images.slice(this.face - 1, this.face);
     
     const containerClasses = classNames('card-link__container', {
-      'card-link__container--open': this.state.display && !!this.state.images.length,
+      'card-link__container--open': this.state.display && !!displayImages.length,
       'card-link__container--bottom': this.state.bottom,
       'card-link__container--top': !this.state.bottom,
       'card-link__container--left': !this.state.right,
@@ -290,7 +324,7 @@ export class CardLink extends StateElement {
     });
 
     return html`
-      <a href=${this.state.scryfallUrl}
+      <a href=${this.state.cardInfo.url}
         target='_blank'
         rel='nofollow noreferrer noopener'
         class='card-link__link'
@@ -300,6 +334,15 @@ export class CardLink extends StateElement {
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
           ${displayImages.map(image => html`<img class='card-link__image' part='image' src='${image}' />`)}
+          ${this.priceInfo ? html`
+            <ul class='card-link__prices' part='price-list'>
+              ${this.state.cardInfo.prices().map(price => price.price ? html`
+                <li class='card-link__price' part='price-item'>
+                  <a part='price-link' href='${price.url}' target='_blank' rel='nofollow noreferrer noopener'>
+                    ${price.symbol}${price.price}
+                  </a>
+                </li>` : null)}
+            </ul>` : null}
         </div>
       </a>
     `;
