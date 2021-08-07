@@ -305,7 +305,7 @@ export class CardLink extends StateElement {
     );
   }
 
-  mouseLeaveEvent(e) {
+  mouseLeaveEvent() {
     this.hideCard();
   }
 

@@ -1,3 +1,5 @@
+/*eslint-env node*/
+
 const path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
@@ -30,21 +32,21 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             plugins: [
-              ["template-html-minifier", {
-                "modules": {
-                  "lit-html": ["html"],
-                  "lit-element": [
-                    "html",
-                    {"name": "css", "encapsulation": "style"}
+              ['template-html-minifier', {
+                'modules': {
+                  'lit-html': ['html'],
+                  'lit-element': [
+                    'html',
+                    {'name': 'css', 'encapsulation': 'style'}
                   ],
                 },
-                "strictCSS": true,
-                "htmlMinifier": {
-                  "collapseWhitespace": true,
-                  "conservativeCollapse": true,
-                  "removeComments": true,
-                  "caseSensitive": true,
-                  "minifyCSS": true
+                'strictCSS': true,
+                'htmlMinifier': {
+                  'collapseWhitespace': true,
+                  'conservativeCollapse': true,
+                  'removeComments': true,
+                  'caseSensitive': true,
+                  'minifyCSS': true
                 },
               }]
             ]
@@ -53,4 +55,4 @@ module.exports = {
       }
     ]
   }
-}
+};
