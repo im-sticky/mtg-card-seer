@@ -48,7 +48,7 @@ export class CardLink extends StateElement {
         }
       }
 
-      .card-link__link {
+      [part="link"] {
         position: relative;
       }
 
@@ -90,13 +90,13 @@ export class CardLink extends StateElement {
         width: ${CARD_WIDTH * 2}px;
       }
 
-      .card-link__image {
+      [part="image"] {
         display: block;
         max-width: 100%;
         height: 100%;
       }
 
-      .card-link__prices {
+      [part="price-list"] {
         margin: 0;
         padding: 0;
         list-style: none;
@@ -105,27 +105,27 @@ export class CardLink extends StateElement {
         background: #fff;
       }
 
-      .card-link__price {
+      [part="price-item"] {
         width: 100%;
         text-align: center;
       }
 
-      .card-link__price:first-child {
+      [part="price-item"]:first-child {
         text-align: right;
       }
 
-      .card-link__price:last-child {
+      [part="price-item"]:last-child {
         text-align: left;
       }
 
-      .card-link__price > a {
+      [part="price-link"] {
         display: block;
         padding: 6px 8px;
         font-size: 80%;
         text-decoration: none;
       }
 
-      .card-link__price > a:hover {
+      [part="price-link"]:hover {
         text-decoration: underline;
       }
     `;
@@ -324,17 +324,16 @@ export class CardLink extends StateElement {
       <a href=${this.state.cardInfo.url}
         target='_blank'
         rel='nofollow noreferrer noopener'
-        class='card-link__link'
         part='link'
         @mouseenter=${this.mouseEnterEvent}
         @mouseleave=${this.mouseLeaveEvent}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
-          ${displayImages.map(image => html`<img class='card-link__image' part='image' src='${image}' />`)}
+          ${displayImages.map(image => html`<img part='image' src='${image}' />`)}
           ${this.priceInfo ? html`
-            <ul class='card-link__prices' part='price-list'>
+            <ul part='price-list'>
               ${this.state.cardInfo.prices().map(price => price.price ? html`
-                <li class='card-link__price' part='price-item'>
+                <li part='price-item'>
                   <a part='price-link' href='${price.url}' target='_blank' rel='nofollow noreferrer noopener'>
                     ${price.symbol}${price.price}
                   </a>
