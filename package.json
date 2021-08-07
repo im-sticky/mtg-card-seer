@@ -1,6 +1,6 @@
 {
   "name": "mtg-card-seer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Web Components for previewing MTG card images automatically",
   "main": "dist/main.bundle.js",
   "scripts": {
