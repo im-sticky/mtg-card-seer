@@ -34,6 +34,16 @@ export class CardLink extends StateElement {
 
   static get styles() {
     return css`
+      @keyframes fadein {
+        from {
+          opacity: 0;
+        }
+      
+        to {
+          opacity: 1;
+        }
+      }
+
       .card-link__link {
         position: relative;
       }
@@ -48,6 +58,10 @@ export class CardLink extends StateElement {
 
       .card-link__container--open {
         display: flex;
+      }
+
+      .card-link__link:hover .card-link__container--open {
+        animation: fadein 83ms ease-out;
       }
 
       .card-link__container--bottom {
@@ -236,9 +250,8 @@ export class CardLink extends StateElement {
   mouseEnterEvent(e) {
     const OFFSET = 8;
     const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
-    const width = containerStyles.getPropertyValue('width');
     const height = containerStyles.getPropertyValue('height');
-    const overflowRight = e.clientX + parseInt(width) > window.innerWidth;
+    const overflowRight = e.clientX > window.innerWidth / 2;
     const overflowBottom = e.clientY + parseInt(height) > window.innerHeight;
     let clientY;
 
@@ -267,7 +280,7 @@ export class CardLink extends StateElement {
 
   render() {
     const displayImages = !this.face ? this.state.images : this.state.images.slice(this.face - 1, this.face);
-
+    
     const containerClasses = classNames('card-link__container', {
       'card-link__container--open': this.state.display && !!this.state.images.length,
       'card-link__container--bottom': this.state.bottom,
