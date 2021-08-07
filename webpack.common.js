@@ -24,10 +24,31 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js)$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            plugins: [
+              ["template-html-minifier", {
+                "modules": {
+                  "lit-html": ["html"],
+                  "lit-element": [
+                    "html",
+                    {"name": "css", "encapsulation": "style"}
+                  ],
+                },
+                "strictCSS": true,
+                "htmlMinifier": {
+                  "collapseWhitespace": true,
+                  "conservativeCollapse": true,
+                  "removeComments": true,
+                  "caseSensitive": true,
+                  "minifyCSS": true
+                },
+              }]
+            ]
+          }
         }
       }
     ]

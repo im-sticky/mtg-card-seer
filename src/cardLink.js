@@ -63,9 +63,6 @@ export class CardLink extends StateElement {
       .card-link__container--open {
         display: flex;
         flex-wrap: wrap;
-      }
-
-      .card-link__link:hover .card-link__container--open {
         animation: fadein 83ms ease-out;
       }
 
