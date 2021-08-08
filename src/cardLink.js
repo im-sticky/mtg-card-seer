@@ -349,7 +349,7 @@ export class CardLink extends StateElement {
 
   handleMobileTouch(e) {
     if (isTouchEvent(e)) {
-      this.emitEvent('touchDisplay');
+      this.emitEvent('touchCard');
 
       if (this.state.display) {
         this.hideCard();

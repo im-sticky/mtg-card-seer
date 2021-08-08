@@ -2,7 +2,7 @@
 
 A set of easy to use HTML Web Components that use the [Scryfall API](https://scryfall.com/) to display MTG card images automatically on hover.
 
-## Basic usage and features
+## Basic usage
 
 Each component has a rich and flexible API that are easy to use out of the box. Basic usage would be wrapping whatever text you would want to function as a card image popover in the `card-link` element like you would with a `span`. This will automatically search and display the specified card when hovering the link. Note that the text does not have to be the card name exactly, it performs a fuzzy search so partial names or spelling errors will work if no cards have a similar name.
 
@@ -12,6 +12,12 @@ Example:
 ```
 
 You can read more about specific component APIs below or view more in depth examples [here](example/index.html).
+
+### Features
+
+- Made for modern browsers
+- Mobile ready
+- Supports external customization
 
 ## Installation
 
@@ -76,6 +82,7 @@ document.querySelector('#selector').addEventListener('fetchCard', e => console.l
 | fetchError | Fired after attempting to query the Scryfall API and getting an 404 not found error. |
 | displayCard | Fired when hovering the link and the card image displays. |
 | hideCard | Fired when moving off the link and the card image hides. |
+| touchCard | Fired when touching the `card-link` component on any touch enabled device. Can be used with `displayCard` / `hideCard` to determine mobile display and hide events. |
 
 #### Styling
 
@@ -101,7 +108,7 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 - [x] ~~add search by collector number to `card-link`~~
 - [x] ~~add ability to specify card face to display for `card-link`~~
 - [x] ~~add optional display for price info to `card-link` preview~~
-- [ ] add proper mobile support for `card-link`
+- [x] ~~add proper mobile support for `card-link`~~
 - [ ] add a11y preview mode for `card-link`
 - [ ] add inline card preview component
 - [ ] add decklist component
