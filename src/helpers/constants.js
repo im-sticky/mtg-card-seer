@@ -37,3 +37,7 @@ export const CARD_HEIGHT_MOBILE = CARD_HEIGHT * 0.8;
 export const MOBILE_WIDTH = 768;
 
 export const POINTER_TYPE_TOUCH = 'touch';
+
+export const KEY_CODES = {
+  TAB: 'Tab',
+};

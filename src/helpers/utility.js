@@ -35,5 +35,6 @@ export function onClickOutside(element, callback) {
 }
 
 export function isTouchEvent(event) {
-  return event.pointerType === POINTER_TYPE_TOUCH || event.sourceCapabilities.firesTouchEvents;
+  return event.pointerType === POINTER_TYPE_TOUCH ||
+    event.sourceCapabilities && event.sourceCapabilities.firesTouchEvents;
 }

@@ -10,6 +10,7 @@ import {
   CARD_HEIGHT,
   CARD_HEIGHT_MOBILE,
   MOBILE_WIDTH,
+  KEY_CODES,
 } from 'helpers/constants';
 import {isTouchEvent} from 'helpers/utility';
 
@@ -372,6 +373,25 @@ export class CardLink extends StateElement {
     }
   }
 
+  onTabFocusIn(e) {
+    if (!isTouchEvent(e) && e.code === KEY_CODES.TAB) {
+      // doesn't have client positions so can't use this.getCardPositions
+      const rect = this.getBoundingClientRect();
+      const overflowRight = rect.left + CARD_WIDTH >= window.innerWidth;
+      const overflowBottom = rect.bottom + CARD_HEIGHT >= window.innerHeight;
+      const clientX = overflowRight ? rect.right : rect.left;
+      const clientY = overflowBottom ? rect.top : rect.bottom;
+
+      this.fetchCard();
+      this.displayCard(
+        clientX,
+        clientY,
+        !overflowBottom,
+        !overflowRight
+      );
+    }
+  }
+
   render() {
     const displayImages = !this.face ? this.state.cardInfo.images : this.state.cardInfo.images.slice(this.face - 1, this.face);
 
@@ -391,7 +411,9 @@ export class CardLink extends StateElement {
         part='link'
         @mouseenter=${this.displayCardEvent}
         @mouseleave=${this.hideCardEvent}
-        @click=${this.handleMobileTouch}>
+        @click=${this.handleMobileTouch}
+        @keyup=${this.onTabFocusIn}
+        @focusout=${this.hideCardEvent}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
           ${displayImages.map(image => html`<img part='image' src='${image}' />`)}
