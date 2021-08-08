@@ -289,36 +289,57 @@ export class CardLink extends StateElement {
     this.dispatch(hideCard(), () => this.emitEvent('hideCard'));
   }
 
-  displayCardEvent(e) {
+  getCardPositions(event, clientPositionOverride = null) {
     const OFFSET = 8;
     const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
     const height = containerStyles.getPropertyValue('height');
-    const overflowRight = e.clientX > window.innerWidth / 2;
-    const overflowBottom = e.clientY + parseInt(height) + this.offsetHeight > window.innerHeight;
-    let clientX = e.clientX + (overflowRight ? OFFSET : -OFFSET);
+    const overflowRight = event.clientX > window.innerWidth / 2;
+    const overflowBottom = event.clientY + parseInt(height) + this.offsetHeight > window.innerHeight;
+    let clientX = event.clientX + (overflowRight ? OFFSET : -OFFSET);
     let clientY;
 
     Array.prototype.slice.call(this.getClientRects()).some(rect => {
-      if (e.clientY >= Math.round(rect.top) &&
-          e.clientY <= Math.round(rect.bottom) &&
-          e.clientX >= Math.round(rect.left) &&
-          e.clientX <= Math.round(rect.right)) {
-        if (isTouchEvent(e)) {
-          clientX = overflowRight ? rect.right : rect.left;
-        }
-
+      if (event.clientY >= Math.round(rect.top) &&
+          event.clientY <= Math.round(rect.bottom) &&
+          event.clientX >= Math.round(rect.left) &&
+          event.clientX <= Math.round(rect.right)) {
         clientY = rect.top + (overflowBottom ? 0 : rect.height);
+
+        if (clientPositionOverride && typeof clientPositionOverride === 'function') {
+          ({clientX, clientY} = clientPositionOverride(rect, {
+            clientX,
+            clientY,
+            overflowBottom,
+            overflowRight,
+          }));
+        }
 
         return true;
       }
     });
 
-    this.fetchCard();
-    this.displayCard(
+    return {
       clientX,
       clientY,
-      !overflowBottom,
-      !overflowRight
+      overflowBottom,
+      overflowRight,
+    };
+  }
+
+  displayCardEvent(e) {
+    if (isTouchEvent(e)) {
+      e.preventDefault();
+      return;
+    }
+
+    const positions = this.getCardPositions(e);
+
+    this.fetchCard();
+    this.displayCard(
+      positions.clientX,
+      positions.clientY,
+      !positions.overflowBottom,
+      !positions.overflowRight
     );
   }
 
@@ -328,8 +349,26 @@ export class CardLink extends StateElement {
 
   handleMobileTouch(e) {
     if (isTouchEvent(e)) {
-      e.preventDefault();
       this.emitEvent('touchDisplay');
+
+      if (this.state.display) {
+        this.hideCard();
+      } else {
+        e.preventDefault();
+
+        const positions = this.getCardPositions(e, (rect, {clientY, overflowRight}) => ({
+          clientX: overflowRight ? rect.right : rect.left,
+          clientY,
+        }));
+
+        this.fetchCard();
+        this.displayCard(
+          positions.clientX,
+          positions.clientY,
+          !positions.overflowBottom,
+          !positions.overflowRight
+        );
+      }
     }
   }
 
