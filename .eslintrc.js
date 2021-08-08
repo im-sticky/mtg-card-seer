@@ -22,6 +22,9 @@ module.exports = {
     'indent': [
       'error',
       2,
+      {
+        'SwitchCase': 1
+      }
     ],
     'keyword-spacing': [
       'error',
@@ -34,6 +37,7 @@ module.exports = {
       'error',
       'always',
     ],
+    'no-trailing-spaces': 'error',
     'object-curly-spacing': [
       'error',
       'never',

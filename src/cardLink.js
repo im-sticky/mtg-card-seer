@@ -11,7 +11,7 @@ import {
   CARD_HEIGHT_MOBILE,
   MOBILE_WIDTH,
 } from 'helpers/constants';
-import {onClickOutside} from 'helpers/onClickOutside';
+import {isTouchEvent} from 'helpers/utility';
 
 
 const [SET_CARD_INFO, setCardInfo] = createAction('SET_CARD_INFO');
@@ -22,7 +22,7 @@ const [HIDE_CARD, hideCard] = createAction('HIDE_CARD');
 
 export class CardLink extends StateElement {
   static get properties() {
-    return { 
+    return {
       name: {
         type: String,
       },
@@ -48,7 +48,7 @@ export class CardLink extends StateElement {
         from {
           opacity: 0;
         }
-      
+
         to {
           opacity: 1;
         }
@@ -138,7 +138,6 @@ export class CardLink extends StateElement {
 
       @media screen and (max-width: ${MOBILE_WIDTH - 1}px) {
         .card-link__container {
-          position: absolute;
           width: ${CARD_WIDTH_MOBILE}px;
           height: ${CARD_HEIGHT_MOBILE}px;
         }
@@ -228,13 +227,6 @@ export class CardLink extends StateElement {
     }
   }
 
-  emitEvent(eventName, initOptions) {
-    this.dispatchEvent(new Event(eventName, Object.assign({
-      bubbles: true,
-      composed: true,
-    }, initOptions)));
-  }
-
   fetchCard() {
     if (this.state.fetched) {
       return;
@@ -251,7 +243,7 @@ export class CardLink extends StateElement {
         endpoint += `${this.state.search.set}/${this.state.search.collector}`;
       } else {
         const searchParams = new URLSearchParams();
-      
+
         Object.keys(this.state.search).forEach(key => {
           if (this.state.search[key]) {
             searchParams.set(key, this.state.search[key]);
@@ -297,11 +289,7 @@ export class CardLink extends StateElement {
     this.dispatch(hideCard(), () => this.emitEvent('hideCard'));
   }
 
-  mouseEnterEvent(e) {
-    if (this.isMobile) {
-      return;
-    }
-
+  displayCardEvent(e) {
     const OFFSET = 8;
     const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
     const height = containerStyles.getPropertyValue('height');
@@ -315,7 +303,12 @@ export class CardLink extends StateElement {
           e.clientY <= Math.round(rect.bottom) &&
           e.clientX >= Math.round(rect.left) &&
           e.clientX <= Math.round(rect.right)) {
+        if (isTouchEvent(e)) {
+          clientX = overflowRight ? rect.right : rect.left;
+        }
+
         clientY = rect.top + (overflowBottom ? 0 : rect.height);
+
         return true;
       }
     });
@@ -329,48 +322,20 @@ export class CardLink extends StateElement {
     );
   }
 
-  mouseLeaveEvent() {
-    if (this.isMobile) {
-      return;
-    }
-
+  hideCardEvent() {
     this.hideCard();
   }
 
-  touchEvent(e) {
-    if (!this.isMobile) {
-      return;
-    }
-
-    e.preventDefault();
-    
-    if (this.state.display) {
-      this.hideCard();
-
-      if (this._removeOutsideClickListener) {
-        this._removeOutsideClickListener();
-      }
-    } else {
-      const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
-      const height = containerStyles.getPropertyValue('height');
-      const overflowRight = this.offsetLeft > window.innerWidth / 2;
-      const overflowBottom = this.getBoundingClientRect().top + parseInt(height) + this.offsetHeight > window.innerHeight;
-      
-      this.fetchCard();
-      this.displayCard(
-        0,
-        overflowBottom ? 0 : this.offsetHeight,
-        !overflowBottom,
-        !overflowRight
-      );
-      
-      this._removeOutsideClickListener = onClickOutside(this, () => this.hideCard());
+  handleMobileTouch(e) {
+    if (isTouchEvent(e)) {
+      e.preventDefault();
+      this.emitEvent('touchDisplay');
     }
   }
 
   render() {
     const displayImages = !this.face ? this.state.cardInfo.images : this.state.cardInfo.images.slice(this.face - 1, this.face);
-    
+
     const containerClasses = classMap({
       'card-link__container': true,
       'card-link__container--open': this.state.display && !!displayImages.length,
@@ -385,9 +350,9 @@ export class CardLink extends StateElement {
         target='_blank'
         rel='nofollow noreferrer noopener'
         part='link'
-        @mouseenter=${this.mouseEnterEvent}
-        @mouseleave=${this.mouseLeaveEvent}
-        @touchend=${this.touchEvent}>
+        @mouseenter=${this.displayCardEvent}
+        @mouseleave=${this.hideCardEvent}
+        @click=${this.handleMobileTouch}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
           ${displayImages.map(image => html`<img part='image' src='${image}' />`)}

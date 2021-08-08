@@ -43,4 +43,11 @@ export class StateElement extends LitElement {
   get isMobile() {
     return window.innerWidth < MOBILE_WIDTH;
   }
+
+  emitEvent(eventName, initOptions) {
+    this.dispatchEvent(new Event(eventName, Object.assign({
+      bubbles: true,
+      composed: true,
+    }, initOptions)));
+  }
 }
