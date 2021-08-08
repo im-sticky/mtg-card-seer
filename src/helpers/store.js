@@ -1,4 +1,5 @@
 import {LitElement} from 'lit-element';
+import {MOBILE_WIDTH} from 'helpers/constants';
 
 
 export function createReducer(initialState, handlers) {
@@ -37,5 +38,9 @@ export class StateElement extends LitElement {
 
   get apiRoot() {
     return 'https://api.scryfall.com/';
+  }
+
+  get isMobile() {
+    return window.innerWidth < MOBILE_WIDTH;
   }
 }

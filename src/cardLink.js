@@ -1,9 +1,17 @@
 import {html, css} from 'lit-element';
-import classNames from 'classnames';
+import {classMap} from 'lit-html/directives/class-map';
 import {createReducer, createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
 import {SearchModel} from 'models/search';
 import {CardModel} from 'models/card';
+import {
+  CARD_WIDTH,
+  CARD_WIDTH_MOBILE,
+  CARD_HEIGHT,
+  CARD_HEIGHT_MOBILE,
+  MOBILE_WIDTH,
+} from 'helpers/constants';
+import {onClickOutside} from 'helpers/onClickOutside';
 
 
 const [SET_CARD_INFO, setCardInfo] = createAction('SET_CARD_INFO');
@@ -11,8 +19,6 @@ const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 const [UPDATE_SEARCH, updateSearch] = createAction('UPDATE_SEARCH');
 const [UPDATE_DISPLAY, updateDisplay] = createAction('UPDATE_DISPLAY');
 const [HIDE_CARD, hideCard] = createAction('HIDE_CARD');
-
-const CARD_WIDTH = 223;
 
 export class CardLink extends StateElement {
   static get properties() {
@@ -56,7 +62,7 @@ export class CardLink extends StateElement {
         z-index: 99;
         position: fixed;
         width: ${CARD_WIDTH}px;
-        height: 310px;
+        height: ${CARD_HEIGHT}px;
         display: none;
       }
 
@@ -127,6 +133,19 @@ export class CardLink extends StateElement {
 
       [part="price-link"]:hover {
         text-decoration: underline;
+      }
+
+
+      @media screen and (max-width: ${MOBILE_WIDTH - 1}px) {
+        .card-link__container {
+          position: absolute;
+          width: ${CARD_WIDTH_MOBILE}px;
+          height: ${CARD_HEIGHT_MOBILE}px;
+        }
+
+        .card-link__container--wide {
+          width: ${CARD_WIDTH_MOBILE * 2}px;
+        }
       }
     `;
   }
@@ -279,11 +298,16 @@ export class CardLink extends StateElement {
   }
 
   mouseEnterEvent(e) {
+    if (this.isMobile) {
+      return;
+    }
+
     const OFFSET = 8;
     const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
     const height = containerStyles.getPropertyValue('height');
     const overflowRight = e.clientX > window.innerWidth / 2;
-    const overflowBottom = e.clientY + parseInt(height) > window.innerHeight;
+    const overflowBottom = e.clientY + parseInt(height) + this.offsetHeight > window.innerHeight;
+    let clientX = e.clientX + (overflowRight ? OFFSET : -OFFSET);
     let clientY;
 
     Array.prototype.slice.call(this.getClientRects()).some(rect => {
@@ -298,7 +322,7 @@ export class CardLink extends StateElement {
 
     this.fetchCard();
     this.displayCard(
-      e.clientX + (overflowRight ? OFFSET : -OFFSET),
+      clientX,
       clientY,
       !overflowBottom,
       !overflowRight
@@ -306,13 +330,49 @@ export class CardLink extends StateElement {
   }
 
   mouseLeaveEvent() {
+    if (this.isMobile) {
+      return;
+    }
+
     this.hideCard();
+  }
+
+  touchEvent(e) {
+    if (!this.isMobile) {
+      return;
+    }
+
+    e.preventDefault();
+    
+    if (this.state.display) {
+      this.hideCard();
+
+      if (this._removeOutsideClickListener) {
+        this._removeOutsideClickListener();
+      }
+    } else {
+      const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
+      const height = containerStyles.getPropertyValue('height');
+      const overflowRight = this.offsetLeft > window.innerWidth / 2;
+      const overflowBottom = this.getBoundingClientRect().top + parseInt(height) + this.offsetHeight > window.innerHeight;
+      
+      this.fetchCard();
+      this.displayCard(
+        0,
+        overflowBottom ? 0 : this.offsetHeight,
+        !overflowBottom,
+        !overflowRight
+      );
+      
+      this._removeOutsideClickListener = onClickOutside(this, () => this.hideCard());
+    }
   }
 
   render() {
     const displayImages = !this.face ? this.state.cardInfo.images : this.state.cardInfo.images.slice(this.face - 1, this.face);
     
-    const containerClasses = classNames('card-link__container', {
+    const containerClasses = classMap({
+      'card-link__container': true,
       'card-link__container--open': this.state.display && !!displayImages.length,
       'card-link__container--bottom': this.state.bottom,
       'card-link__container--top': !this.state.bottom,
@@ -326,7 +386,8 @@ export class CardLink extends StateElement {
         rel='nofollow noreferrer noopener'
         part='link'
         @mouseenter=${this.mouseEnterEvent}
-        @mouseleave=${this.mouseLeaveEvent}>
+        @mouseleave=${this.mouseLeaveEvent}
+        @touchend=${this.touchEvent}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
           ${displayImages.map(image => html`<img part='image' src='${image}' />`)}

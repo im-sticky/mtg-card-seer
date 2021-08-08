@@ -3,48 +3,48 @@
 module.exports = {
   'env': {
     'browser': true,
-    'es2021': true
+    'es2021': true,
   },
   'extends': 'eslint:recommended',
   'parserOptions': {
     'ecmaVersion': 12,
-    'sourceType': 'module'
+    'sourceType': 'module',
   },
   'rules': {
     'brace-style': [
       'error',
-      '1tbs'
+      '1tbs',
     ],
     'curly': [
       'error',
-      'all'
+      'all',
     ],
     'indent': [
       'error',
-      2
+      2,
     ],
     'keyword-spacing': [
       'error',
       {
         'after': true,
-        'before': true
-      }
+        'before': true,
+      },
     ],
     'newline-after-var': [
       'error',
-      'always'
+      'always',
     ],
     'object-curly-spacing': [
       'error',
-      'never'
+      'never',
     ],
     'quotes': [
       'error',
-      'single'
+      'single',
     ],
     'semi': [
       'error',
-      'always'
-    ]
-  }
+      'always',
+    ],
+  },
 };
