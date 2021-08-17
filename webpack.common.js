@@ -1,26 +1,26 @@
 /*eslint-env node*/
 
 const path = require('path',);
-const {CleanWebpackPlugin,} = require('clean-webpack-plugin',);
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
   entry: './src/index.js',
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist',),
+    path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
     new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ['**/*', '!.git',],
+      cleanOnceBeforeBuildPatterns: ['**/*', '!.git'],
     }),
   ],
   resolve: {
     modules: [
       'node_modules',
-      path.resolve(__dirname + '/src',),
+      path.resolve(__dirname + '/src'),
     ],
     alias: {
-      src: path.resolve(__dirname + '/src',),
+      src: path.resolve(__dirname + '/src'),
     },
   },
   module: {
@@ -35,10 +35,10 @@ module.exports = {
               [
                 'template-html-minifier', {
                   'modules': {
-                    'lit-html': ['html',],
+                    'lit-html': ['html'],
                     'lit-element': [
                       'html',
-                      {'name': 'css', 'encapsulation': 'style',},
+                      {'name': 'css', 'encapsulation': 'style'},
                     ],
                   },
                   'strictCSS': true,
