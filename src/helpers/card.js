@@ -1,4 +1,4 @@
-import {createReducer, createAction, StateElement} from 'helpers/store';
+import {createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
 import {SearchModel} from 'models/search';
 import {CardModel} from 'models/card';
@@ -36,7 +36,7 @@ export class Card extends StateElement {
 
     const searchTerm = this.getAttribute('name') || this.textContent;
 
-    this.state = Object.assign({
+    const state = Object.assign({
       fetched: false,
       cardInfo: new CardModel({
         url: `https://scryfall.com/search?q="${encodeURIComponent(searchTerm)}"`,
@@ -48,7 +48,7 @@ export class Card extends StateElement {
       }),
     }, additionalState);
 
-    this.reducer = createReducer({...this.state}, Object.assign({
+    const handlers = Object.assign({
       [SET_CARD_INFO]: (state, action) => ({
         ...state,
         cardInfo: new CardModel({...action.value}),
@@ -62,7 +62,9 @@ export class Card extends StateElement {
         search: new SearchModel({...action.value}),
         fetched: false,
       }),
-    }, reducerHandlers));
+    }, reducerHandlers);
+
+    this.createReducer(state, handlers);
   }
 
   connectedCallback() {
