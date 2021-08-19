@@ -50,4 +50,8 @@ export class StateElement extends LitElement {
       composed: true,
     }, initOptions)));
   }
+
+  render() {
+    throw new Error('NotImplementedError');
+  }
 }
