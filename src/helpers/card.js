@@ -3,7 +3,6 @@ import {CardCache} from 'helpers/cache';
 import {SearchModel} from 'models/search';
 import {CardModel} from 'models/card';
 
-
 const [SET_CARD_INFO, setCardInfo] = createAction('SET_CARD_INFO');
 const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 const [UPDATE_SEARCH, updateSearch] = createAction('UPDATE_SEARCH');

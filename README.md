@@ -110,7 +110,7 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 - [x] ~~add optional display for price info to `card-link` preview~~
 - [x] ~~add proper mobile support for `card-link`~~
 - [ ] add a11y preview mode for `card-link`
-- [ ] add inline card preview component
+- [x] ~~add inline card preview component~~
 - [ ] add decklist component
 - [ ] add sideboard cuts/adds component
 
