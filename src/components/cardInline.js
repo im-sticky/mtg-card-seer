@@ -1,21 +1,13 @@
 import {html, css} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
-import {createAction} from 'helpers/store';
 import {Card} from 'helpers/card';
-import {
-  CARD_WIDTH,
-  CARD_WIDTH_MOBILE,
-  CARD_HEIGHT,
-  CARD_HEIGHT_MOBILE,
-  MOBILE_WIDTH,
-} from 'helpers/constants';
+import {CARD_WIDTH} from 'helpers/constants';
 
 export class CardInline extends Card {
   static get properties() {
     return {
-      isStatic: {
+      static: {
         type: Boolean,
-        attribute: 'is-static',
       },
     };
   }
@@ -26,7 +18,7 @@ export class CardInline extends Card {
         display: inline-flex;
         flex-wrap: wrap;
         width: ${CARD_WIDTH}px;
-        height: ${CARD_HEIGHT}px;
+        max-width: 100%;
       }
 
       [part='container'].wide {
@@ -37,6 +29,10 @@ export class CardInline extends Card {
         display: block;
         max-width: 100%;
         height: 100%;
+      }
+
+      [part='container'].wide [part="image"] {
+        width: 50%;
       }
 
       [part="price-list"] {
@@ -77,7 +73,7 @@ export class CardInline extends Card {
   constructor() {
     super();
 
-    this.isStatic = false;
+    this.static = false;
     this.fetchCard();
   }
 
@@ -96,7 +92,7 @@ export class CardInline extends Card {
     `;
 
     return html`
-      ${this.isStatic ?
+      ${this.static ?
     html`<div class=${classMap({'wide': this.displayImages.length > 1})} part='container'>
       ${internalHtml}
     </div>` :
