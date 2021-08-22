@@ -6,14 +6,14 @@ import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 export class CardModel {
   /**
    * Initializes the model with all relevant card data.
-   * @param {Array} images All card face image URLs.
+   * @param {Array} faces All card faces containing image URL and name.
    * @param {String} url URL to Scryfall page for specific card.
    * @param {Object} usd Contains all relevant price data in US dollars.
    * @param {Object} tix Contains all relevant price data in MTGO tix.
-   * @param {Object} eur Contains all relevatn price data in Euros.
+   * @param {Object} eur Contains all relevant price data in Euros.
    */
-  constructor({images, url, usd, tix, eur}) {
-    this.images = images || [];
+  constructor({faces, url, usd, tix, eur}) {
+    this.faces = faces || [];
     this.url = url;
     this.usd = new PriceModel({...usd});
     this.tix = new PriceModel({...tix});
@@ -27,9 +27,15 @@ export class CardModel {
    */
   static fromApi(scryfall) {
     return new this({
-      images: DOUBLE_SIDED_LAYOUTS.includes(scryfall.layout) ?
-        scryfall.card_faces.map(face => face.image_uris.normal) :
-        [scryfall.image_uris.normal],
+      faces: DOUBLE_SIDED_LAYOUTS.includes(scryfall.layout) ?
+        scryfall.card_faces.map(face => new CardFaceModel({
+          name: face.name,
+          image: face.image_uris.normal,
+        })) :
+        [new CardFaceModel({
+          name: scryfall.name,
+          image: scryfall.image_uris.normal,
+        })],
       url: scryfall.scryfall_uri,
       usd: {
         price: scryfall.prices.usd,
@@ -76,5 +82,20 @@ export class PriceModel {
     this.price = price;
     this.url = url;
     this.symbol = symbol;
+  }
+}
+
+/**
+ * Model for card face object to be used within the CardModel.
+ */
+export class CardFaceModel {
+  /**
+   * initializes model properties.
+   * @param {String} name Name of the card.
+   * @param {String} image URL of card image.
+   */
+  constructor({name, image}) {
+    this.name = name;
+    this.image = image;
   }
 }

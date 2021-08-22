@@ -88,9 +88,8 @@ export class CardInline extends Card {
    * @returns {TemplateResult} LitHtml template.
    */
   render() {
-    // TODO: add alt attribute to image, store card text in cache
     const internalHtml = html`
-      ${this.displayImages.map(image => html`<img part='image' src='${image}' />`)}
+      ${this.displayFaces.map(face => html`<img part='image' src='${face.image}' alt='${face.name}' />`)}
       ${this.priceInfo ? html`
         <ul part='price-list'>
           ${this.state.cardInfo.prices().map(price => price.price ? html`
@@ -104,10 +103,10 @@ export class CardInline extends Card {
 
     return html`
       ${this.static ?
-    html`<div class=${classMap({'wide': this.displayImages.length > 1})} part='container'>
+    html`<div class=${classMap({'wide': this.displayFaces.length > 1})} part='container'>
       ${internalHtml}
     </div>` :
-    html`<a class=${classMap({'wide': this.displayImages.length > 1})} part='container' href=${this.state.cardInfo.url} target='_blank' rel='nofollow noreferrer noopener'>
+    html`<a class=${classMap({'wide': this.displayFaces.length > 1})} part='container' href=${this.state.cardInfo.url} target='_blank' rel='nofollow noreferrer noopener'>
       ${internalHtml}
     </a>`}
     `;

@@ -115,11 +115,11 @@ export class Card extends StateElement {
   }
 
   /**
-   * Getter for currently available card images based on specified card faces.
-   * @returns {Array} Available card images.
+   * Getter for currently available card faces based on specified card faces.
+   * @returns {Array} Available card faces.
    */
-  get displayImages() {
-    return !this.face ? this.state.cardInfo.images : this.state.cardInfo.images.slice(this.face - 1, this.face);
+  get displayFaces() {
+    return !this.face ? this.state.cardInfo.faces : this.state.cardInfo.faces.slice(this.face - 1, this.face);
   }
 
   /**

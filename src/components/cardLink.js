@@ -80,6 +80,10 @@ export class CardLink extends Card {
         height: 100%;
       }
 
+      .card-link__container--wide [part="image"] {
+        width: 50%;
+      }
+
       [part="price-list"] {
         margin: 0;
         padding: 0;
@@ -307,11 +311,11 @@ export class CardLink extends Card {
   render() {
     const containerClasses = classMap({
       'card-link__container': true,
-      'card-link__container--open': this.state.display && !!this.displayImages.length,
+      'card-link__container--open': this.state.display && !!this.displayFaces.length,
       'card-link__container--bottom': this.state.bottom,
       'card-link__container--top': !this.state.bottom,
       'card-link__container--left': !this.state.right,
-      'card-link__container--wide': this.displayImages.length > 1,
+      'card-link__container--wide': this.displayFaces.length > 1,
     });
 
     return html`
@@ -326,7 +330,7 @@ export class CardLink extends Card {
         @focusout=${this.hideCardEvent}>
         <slot></slot>
         <div class=${containerClasses} part='container' style='left: ${this.state.cardX}px; top: ${this.state.cardY}px;'>
-          ${this.displayImages.map(image => html`<img part='image' src='${image}' />`)}
+          ${this.displayFaces.map(face => html`<img part='image' src='${face.image}' alt='${face.name}' />`)}
           ${this.priceInfo ? html`
             <ul part='price-list'>
               ${this.state.cardInfo.prices().map(price => price.price ? html`
