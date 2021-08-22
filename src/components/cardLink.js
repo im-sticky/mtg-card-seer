@@ -16,7 +16,9 @@ import {isTouchEvent} from 'helpers/utility';
 const [UPDATE_DISPLAY, updateDisplay] = createAction('UPDATE_DISPLAY');
 const [HIDE_CARD, hideCard] = createAction('HIDE_CARD');
 
-
+/**
+ * Component for rendering a link that displays a card image on hover.
+ */
 export class CardLink extends Card {
   static get styles() {
     return css`
@@ -125,6 +127,9 @@ export class CardLink extends Card {
     `;
   }
 
+  /**
+   * Initializes component with additional state and reducer actions.
+   */
   constructor() {
     super({
       display: false,
@@ -148,6 +153,13 @@ export class CardLink extends Card {
     });
   }
 
+  /**
+   * Sets the state of the component to display the card images and emits the related event.
+   * @param {Number} cardX X position relative to the browser for the card images.
+   * @param {Number} cardY Y position relative to the browser for the card images.
+   * @param {Boolean} bottom If images should extend downwards from the link.
+   * @param {Boolean} right If the images should extend right from the link.
+   */
   displayCard(cardX, cardY, bottom = true, right = true) {
     this.dispatch(updateDisplay({
       display: true,
@@ -158,10 +170,19 @@ export class CardLink extends Card {
     }), () => this.emitEvent('displayCard'));
   }
 
+  /**
+   * Sets the state of the component to hide the card images and emits the related event.
+   */
   hideCard() {
     this.dispatch(hideCard(), () => this.emitEvent('hideCard'));
   }
 
+  /**
+   * Calculates the corresponding positions and flow for the card images based on where the event took place on the page.
+   * @param {Event} event JS event object dispatched from the current element.
+   * @param {Function} clientPositionOverride Optional function that will override setting the X and Y position.
+   * @returns {Object} Object containing X, Y, and flow state positions.
+   */
   getCardPositions(event, clientPositionOverride = null) {
     const OFFSET = 8;
     const containerStyles = window.getComputedStyle(this.shadowRoot.querySelector('.card-link__container'));
@@ -199,6 +220,10 @@ export class CardLink extends Card {
     };
   }
 
+  /**
+   * Fetches and displays card images based on a user triggered mouse event.
+   * @param {Event} e JS event dispatched from link.
+   */
   displayCardEvent(e) {
     if (isTouchEvent(e)) {
       e.preventDefault();
@@ -216,10 +241,17 @@ export class CardLink extends Card {
     );
   }
 
+  /**
+   * Hides the card images based on a user triggered mouse event.
+   */
   hideCardEvent() {
     this.hideCard();
   }
 
+  /**
+   * Fetches and displays card images with position overrides or hides them based user triggered touch event.
+   * @param {Event} e JS event dispatched from link.
+   */
   handleMobileTouch(e) {
     if (isTouchEvent(e)) {
       this.emitEvent('touchCard');
@@ -245,6 +277,10 @@ export class CardLink extends Card {
     }
   }
 
+  /**
+   * Fetches and displays card images based on a user triggered keyboard event.
+   * @param {Event} e JS event dispatched from link.
+   */
   onTabFocusIn(e) {
     if (!isTouchEvent(e) && e.code === KEY_CODES.TAB) {
       // doesn't have client positions so can't use this.getCardPositions
@@ -264,6 +300,10 @@ export class CardLink extends Card {
     }
   }
 
+  /**
+   * LitElement lifecycle method for rendering HTML to DOM.
+   * @returns {TemplateResult} LitHtml template.
+   */
   render() {
     const containerClasses = classMap({
       'card-link__container': true,

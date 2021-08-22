@@ -3,6 +3,9 @@ import {classMap} from 'lit-html/directives/class-map';
 import {Card} from 'helpers/card';
 import {CARD_WIDTH} from 'helpers/constants';
 
+/**
+ * Component for displaying an inline card image.
+ */
 export class CardInline extends Card {
   static get properties() {
     return {
@@ -70,6 +73,9 @@ export class CardInline extends Card {
     `;
   }
 
+  /**
+   * Initializes component by fetching card data.
+   */
   constructor() {
     super();
 
@@ -77,6 +83,10 @@ export class CardInline extends Card {
     this.fetchCard();
   }
 
+  /**
+   * LitElement lifecycle method for rendering HTML to DOM.
+   * @returns {TemplateResult} LitHtml template.
+   */
   render() {
     // TODO: add alt attribute to image, store card text in cache
     const internalHtml = html`

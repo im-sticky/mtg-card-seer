@@ -35,7 +35,7 @@ export class Card extends StateElement {
   }
 
   /**
-   * Constructor that takes a state and reducer object.
+   * Takes a state and reducer object and initializes reducer.
    * @param {Object} additionalState Additional state to be included with the base state values.
    * @param {Object} reducerHandlers Additional reducer handlers to be included with the base handlers.
    */
@@ -114,7 +114,6 @@ export class Card extends StateElement {
     }
   }
 
-
   /**
    * Getter for currently available card images based on specified card faces.
    * @returns {Array} Available card images.
@@ -124,7 +123,8 @@ export class Card extends StateElement {
   }
 
   /**
-   *
+   * Method for retrieving card data from Scryfall API.
+   * Checks first if card has already been fetched or if it exists in the cache.
    */
   fetchCard() {
     if (this.state.fetched) {
@@ -174,6 +174,9 @@ export class Card extends StateElement {
     this.dispatch(setFetched());
   }
 
+  /**
+   * LitElement lifecycle method. To be overwritten in sub class or throws error.
+   */
   render() {
     throw new Error('NotImplementedError');
   }
