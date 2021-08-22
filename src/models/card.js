@@ -28,14 +28,8 @@ export class CardModel {
   static fromApi(scryfall) {
     return new this({
       faces: DOUBLE_SIDED_LAYOUTS.includes(scryfall.layout) ?
-        scryfall.card_faces.map(face => new CardFaceModel({
-          name: face.name,
-          image: face.image_uris.normal,
-        })) :
-        [new CardFaceModel({
-          name: scryfall.name,
-          image: scryfall.image_uris.normal,
-        })],
+        scryfall.card_faces.map(face => FaceModel.fromApi(face)) :
+        [FaceModel.fromApi(scryfall)],
       url: scryfall.scryfall_uri,
       usd: {
         price: scryfall.prices.usd,
@@ -88,7 +82,7 @@ export class PriceModel {
 /**
  * Model for card face object to be used within the CardModel.
  */
-export class CardFaceModel {
+export class FaceModel {
   /**
    * initializes model properties.
    * @param {String} name Name of the card.
@@ -97,5 +91,17 @@ export class CardFaceModel {
   constructor({name, image}) {
     this.name = name;
     this.image = image;
+  }
+
+  /**
+   * Static method to be used for creating a new FaceModel from a Scryfall API response object.
+   * @param {any} scryfall
+   * @returns {any}
+   */
+  static fromApi(scryfall) {
+    return new this({
+      name: scryfall.name,
+      image: scryfall.image_uris.normal,
+    });
   }
 }
