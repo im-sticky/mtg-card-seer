@@ -26,7 +26,8 @@
   },
   "homepage": "https://github.com/im-sticky/mtg-card-seer#readme",
   "dependencies": {
-    "lit-element": "^2.5.1"
+    "lit-element": "^2.5.1",
+    "mtg-decklist-parser": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",

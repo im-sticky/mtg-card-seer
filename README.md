@@ -103,6 +103,54 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 | price-item | \<li\> | Individual list item for a price. |
 | price-link | \<a\> | Link which contains pricing text. |
 
+### \<card-inline\>
+
+#### Attributes
+
+HTML attributes that can be used to specify information to the component directly. All are optional. Example:
+```html
+<card-inline static>Whir of Invention</card-inline>
+```
+
+| Attribute | Type | Description |
+|---|---|---|
+| name | String | Specifies the fuzzy search term. Has priority in being used over text directly specified in the component. |
+| set | String | The 3-5 letter magic set code to search within. Sets and their codes can be found [here](https://scryfall.com/sets). |
+| collector | Number | The specific collector number of the card to find. the `set` attribute is required if using this. |
+| face | Number | Specific card image to show for double sided cards. 1 is front and 2 is back. |
+| price-info | Boolean | Shows any available pricing information and links to purchase sites. |
+| static | Boolean | The rendered images will not be links leading to Scryfall. |
+
+#### Events
+
+JavaScript event listeners you can hook into. Example:
+```js
+document.querySelector('#selector').addEventListener('fetchCard', e => console.log('fetched card', e));
+```
+
+| Event | Description |
+|---|---|
+| fetchCard | Fired after querying the Scryfall API and getting a successful response. |
+| fetchError | Fired after attempting to query the Scryfall API and getting an 404 not found error. |
+
+#### Styling
+
+This component uses the Shadow DOM and requires to be styled using specific [::part selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/::part). Example:
+```css
+.element-selector::part(link) {
+  color: red;
+  text-decoration: none;
+}
+```
+
+| Part | Matching Element | Description |
+|---|---|---|
+| container | \<div\> | Container element for all inline images. |
+| image | \<img\> | The image that is retrieved from Scryfall. May be multiple images for double-faced cards. |
+| price-list | \<ul\> | List container for all of the prices. |
+| price-item | \<li\> | Individual list item for a price. |
+| price-link | \<a\> | Link which contains pricing text. |
+
 ## Feature roadmap
 
 - [x] ~~add search by collector number to `card-link`~~
@@ -110,7 +158,7 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 - [x] ~~add optional display for price info to `card-link` preview~~
 - [x] ~~add proper mobile support for `card-link`~~
 - [ ] add a11y preview mode for `card-link`
-- [ ] add inline card preview component
+- [x] ~~add inline card preview component~~
 - [ ] add decklist component
 - [ ] add sideboard cuts/adds component
 

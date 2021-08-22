@@ -47,6 +47,14 @@
       .bottom {
         margin-top: auto;
       }
+
+      .flex {
+        display: flex;
+      }
+
+      card-inline {
+        margin: 0 8px;
+      }
     </style>
   </head>
 
@@ -63,6 +71,11 @@
       <card-link>No results</card-link>
 
       <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates nihil quam labore, asperiores corporis voluptas necessitatibus aliquam rem <card-link>The great henge</card-link> eum saepe. Officia, soluta accusantium! Ea unde nisi aspernatur. Fuga, est mollitia?</p>
+
+      <div class="flex">
+        <card-inline>Birthing Pod</card-inline>
+        <card-inline static set="SHM">Kitchen Finks</card-inline>
+      </div>
 
       <card-link class="right">Stoneforge Mystic</card-link>
       <card-link class="right" set="wwk">Stoneforge Mystic</card-link>
