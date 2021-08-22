@@ -8,6 +8,10 @@ const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 const [UPDATE_SEARCH, updateSearch] = createAction('UPDATE_SEARCH');
 
 
+/**
+ * Class intended to be inherited by individual card based components.
+ * Contains methods for fetching from the Scryfall API and handling local state.
+ */
 export class Card extends StateElement {
   static get properties() {
     return {
@@ -30,6 +34,11 @@ export class Card extends StateElement {
     };
   }
 
+  /**
+   * Constructor that takes a state and reducer object.
+   * @param {Object} additionalState Additional state to be included with the base state values.
+   * @param {Object} reducerHandlers Additional reducer handlers to be included with the base handlers.
+   */
   constructor(additionalState, reducerHandlers) {
     super();
 
@@ -66,10 +75,10 @@ export class Card extends StateElement {
     this.createReducer(state, handlers);
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-  }
-
+  /**
+   * Setter for updating state from new name param value.
+   * @param {String} newVal New value for param.
+   */
   set name(newVal) {
     if (newVal !== this.state.search.fuzzy) {
       this.dispatch(updateSearch({
@@ -79,6 +88,10 @@ export class Card extends StateElement {
     }
   }
 
+  /**
+   * Setter for updating state from new set param value.
+   * @param {String} newVal New value for param.
+   */
   set set(newVal) {
     if (newVal !== this.state.search.set) {
       this.dispatch(updateSearch({
@@ -88,6 +101,10 @@ export class Card extends StateElement {
     }
   }
 
+  /**
+   * Setter for updating state from new collector param value.
+   * @param {String} newVal New value for param.
+   */
   set collector(newVal) {
     if (newVal !== this.state.search.collector) {
       this.dispatch(updateSearch({
@@ -97,10 +114,18 @@ export class Card extends StateElement {
     }
   }
 
+
+  /**
+   * Getter for currently available card images based on specified card faces.
+   * @returns {Array} Available card images.
+   */
   get displayImages() {
     return !this.face ? this.state.cardInfo.images : this.state.cardInfo.images.slice(this.face - 1, this.face);
   }
 
+  /**
+   *
+   */
   fetchCard() {
     if (this.state.fetched) {
       return;

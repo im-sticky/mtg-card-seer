@@ -20,10 +20,6 @@ export class StateElement extends LitElement {
     };
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-  }
-
   get apiRoot() {
     return 'https://api.scryfall.com/';
   }

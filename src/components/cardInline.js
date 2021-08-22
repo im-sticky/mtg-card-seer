@@ -78,6 +78,7 @@ export class CardInline extends Card {
   }
 
   render() {
+    // TODO: add alt attribute to image, store card text in cache
     const internalHtml = html`
       ${this.displayImages.map(image => html`<img part='image' src='${image}' />`)}
       ${this.priceInfo ? html`
