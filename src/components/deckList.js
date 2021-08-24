@@ -5,6 +5,7 @@ import {createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
 import {DeckModel} from 'models/deck';
 import {
+  MTGA_UNIQUE_SET_CODES,
   CARD_WIDTH,
   CARD_WIDTH_MOBILE,
   CARD_HEIGHT,
@@ -101,18 +102,19 @@ export class DeckList extends StateElement {
 
     allCards = [...new Map(allCards.map(x => [x.name, x])).values()];
 
+    // Note: MTGA Dominaria set has a unique set code that Scryfall does not handle properly.
     const scryfallQuery = {
       identifiers: allCards.map(x => {
         if (x.mtgoID) {
           return {
             mtgo_id: x.mtgoID,
           };
-        } else if (x.collectors && x.set) {
+        } else if (x.collectors && x.set && !MTGA_UNIQUE_SET_CODES.includes(x.set.toUpperCase())) {
           return {
             set: x.set,
             collector_number: x.collectors.toString(),
           };
-        } else if (x.set) {
+        } else if (x.set && !MTGA_UNIQUE_SET_CODES.includes(x.set.toUpperCase())) {
           return {
             name: x.name,
             set: x.set,
@@ -140,6 +142,8 @@ export class DeckList extends StateElement {
 
           return;
         }
+
+        resp.not_found.forEach(x => console.error('Did not find results for: ', x));
 
         this.dispatch(setDecklist(resp.data, list));
         this.dispatch(setFetched(true));
