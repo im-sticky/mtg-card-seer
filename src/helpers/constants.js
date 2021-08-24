@@ -30,6 +30,26 @@ export const DOUBLE_SIDED_LAYOUTS = [
   CARD_LAYOUTS.double_sided,
 ];
 
+export const CARD_TYPES = {
+  instant: 'Instant',
+  sorcery: 'Sorcery',
+  artifact: 'Artifact',
+  creature: 'Creature',
+  enchantment: 'Enchantment',
+  land: 'Land',
+  planeswalker: 'Planeswalker',
+};
+
+export const CARD_TYPE_ORDER = [
+  CARD_TYPES.creature,
+  CARD_TYPES.planeswalker,
+  CARD_TYPES.sorcery,
+  CARD_TYPES.instant,
+  CARD_TYPES.artifact,
+  CARD_TYPES.enchantment,
+  CARD_TYPES.land,
+];
+
 export const CARD_WIDTH = 222;
 export const CARD_WIDTH_MOBILE = CARD_WIDTH * 0.8;
 export const CARD_HEIGHT = 310;

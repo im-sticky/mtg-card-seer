@@ -11,10 +11,12 @@ export class CardModel {
    * @param {Object} usd Contains all relevant price data in US dollars.
    * @param {Object} tix Contains all relevant price data in MTGO tix.
    * @param {Object} eur Contains all relevant price data in Euros.
+   * @param {Number} amount The number of cards within a deck. Default 1;
    */
-  constructor({faces, url, usd, tix, eur}) {
-    this.faces = faces || [];
+  constructor({faces = [], url, usd, tix, eur, amount = 1}) {
+    this.faces = faces;
     this.url = url;
+    this.amount = amount;
     this.usd = new PriceModel({...usd});
     this.tix = new PriceModel({...tix});
     this.eur = new PriceModel({...eur});
@@ -25,12 +27,13 @@ export class CardModel {
    * @param {Object} scryfall Scryfall API response object.
    * @returns {CardModel} New CardModel with Scryfall data.
    */
-  static fromApi(scryfall) {
+  static fromApi(scryfall, amount = 1) {
     return new this({
       faces: DOUBLE_SIDED_LAYOUTS.includes(scryfall.layout) ?
         scryfall.card_faces.map(face => FaceModel.fromApi(face)) :
         [FaceModel.fromApi(scryfall)],
       url: scryfall.scryfall_uri,
+      amount,
       usd: {
         price: scryfall.prices.usd,
         url: scryfall.purchase_uris.tcgplayer,
