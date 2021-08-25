@@ -1,5 +1,5 @@
 import {CardModel} from './card';
-import {CARD_TYPES, CARD_TYPE_ORDER} from 'helpers/constants';
+import {CARD_TYPES, CARD_TYPE_PRECEDENCE, DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 
 /**
  * Model used for managing deck object data in decklist based components.
@@ -40,8 +40,13 @@ export class DeckModel {
         return;
       }
 
-      CARD_TYPE_ORDER.some(type => {
-        if (scryfallCard.type_line.match(new RegExp(type, 'i'))) {
+      CARD_TYPE_PRECEDENCE.some(type => {
+        // for double faced cards use the front face to determine type
+        var matchAgainst = DOUBLE_SIDED_LAYOUTS.includes(scryfallCard.layout) ?
+          scryfallCard.card_faces[0].type_line :
+          scryfallCard.type_line;
+
+        if (matchAgainst.match(new RegExp(type, 'i'))) {
           sections[type].push(CardModel.fromApi(scryfallCard, card.amount));
 
           return true;
@@ -78,6 +83,6 @@ export class DeckModel {
 export class DeckSectionModel {
   constructor({title, cards}) {
     this.title = title;
-    this.card = Array.isArray(cards) ? cards : [cards];
+    this.cards = Array.isArray(cards) ? cards : [cards];
   }
 }

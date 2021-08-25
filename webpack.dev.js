@@ -18,7 +18,7 @@ module.exports = merge(common, {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: 'example/*.txt',
+          from: 'example/*.(txt|dek)',
         }
       ]
     }),

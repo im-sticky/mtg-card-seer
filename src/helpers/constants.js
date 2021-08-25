@@ -50,6 +50,16 @@ export const CARD_TYPE_ORDER = [
   CARD_TYPES.land,
 ];
 
+export const CARD_TYPE_PRECEDENCE = [
+  CARD_TYPES.planeswalker,
+  CARD_TYPES.creature,
+  CARD_TYPES.land,
+  CARD_TYPES.sorcery,
+  CARD_TYPES.instant,
+  CARD_TYPES.artifact,
+  CARD_TYPES.enchantment,
+];
+
 export const MTGA_UNIQUE_SET_CODES = [
   'DAR',
 ];
