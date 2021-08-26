@@ -160,7 +160,9 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 - [ ] add a11y preview mode for `card-link`
 - [x] ~~add inline card preview component~~
 - [ ] add decklist component
+- [ ] decklist component visual view
 - [ ] add sideboard cuts/adds component
+- [ ] multilingual support
 
 Discovered a bug? Log it [here](https://github.com/im-sticky/mtg-card-seer/issues) with browser details and steps to replicate it.
 

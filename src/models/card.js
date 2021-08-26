@@ -6,12 +6,13 @@ import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 export class CardModel {
   /**
    * Initializes the model with all relevant card data.
+   * @param {String} name Complete name of card.
    * @param {Array} faces All card faces containing image URL and name.
    * @param {String} url URL to Scryfall page for specific card.
    * @param {Object} usd Contains all relevant price data in US dollars.
    * @param {Object} tix Contains all relevant price data in MTGO tix.
    * @param {Object} eur Contains all relevant price data in Euros.
-   * @param {Number} amount The number of cards within a deck. Default 1;
+   * @param {Number} amount The number of cards that would be within a deck.
    */
   constructor({name, faces = [], url, usd, tix, eur, amount = 1}) {
     this.name = name;
@@ -26,6 +27,7 @@ export class CardModel {
   /**
    * Static method to be used for creating a new CardModel based on result from Scryfall API.
    * @param {Object} scryfall Scryfall API response object.
+   * @param {Number} amount The number of cards that would be within a deck.
    * @returns {CardModel} New CardModel with Scryfall data.
    */
   static fromApi(scryfall, amount = 1) {
@@ -90,8 +92,8 @@ export class PriceModel {
 export class FaceModel {
   /**
    * initializes model properties.
-   * @param {String} name Name of the card.
-   * @param {String} image URL of card image.
+   * @param {String} name Name of the card face.
+   * @param {String} image URL of card face image.
    */
   constructor({name, image}) {
     this.name = name;

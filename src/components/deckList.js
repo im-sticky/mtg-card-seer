@@ -2,16 +2,18 @@ import {html, css} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
 import {autoParse} from 'mtg-decklist-parser';
 import {createAction, StateElement} from 'helpers/store';
-import {CardCache} from 'helpers/cache';
+import {SearchModel} from 'models/search';
 import {DeckModel} from 'models/deck';
 import {
   MTGA_UNIQUE_SET_CODES,
+  CARD_TYPE_ORDER,
   CARD_WIDTH,
   CARD_WIDTH_MOBILE,
   CARD_HEIGHT,
   CARD_HEIGHT_MOBILE,
   MOBILE_WIDTH,
   KEY_CODES,
+  PRIMARY_COLOR,
 } from 'helpers/constants';
 
 
@@ -23,6 +25,9 @@ const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 export class DeckList extends StateElement {
   static get properties() {
     return {
+      title: {
+        type: String,
+      },
       src: {
         type: String,
       },
@@ -31,8 +36,84 @@ export class DeckList extends StateElement {
 
   static get styles() {
     return css`
-      [part="container"] {
+      @keyframes fadein {
+        from {
+          opacity: 0;
+        }
 
+        to {
+          opacity: 1;
+        }
+      }
+
+      seer-loader {
+        display: block;
+      }
+
+      [part="container"] {
+        animation: fadein 83ms ease-out;
+        max-width: 840px;
+      }
+
+      [part="title"] {
+        text-align: center;
+        margin: 0 0 1rem 0;
+      }
+
+      [part="body"] {
+        column-count: 3;
+      }
+
+      [part="preview"] {
+        width: ${CARD_WIDTH};
+        height: ${CARD_HEIGHT};
+        background-image: url(https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=0&type=card);
+        background-size: 100% auto;
+        background-repeat: no-repeat;
+      }
+
+      [part="preview-image"] {
+        width: 100%;
+        height: 100%;
+      }
+
+      [part="section"] {
+        page-break-inside: avoid;
+        break-inside: avoid-column;
+        display: table;
+        padding: 0.5rem;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      [part="section-title"] {
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+      }
+
+      [part="section-item"] {
+        margin: 0;
+      }
+
+      [part="separator"] {
+        column-span: all;
+        border-top: 1px solid #000;
+      }
+
+      @media screen and (max-width: ${MOBILE_WIDTH - 1}px) {
+        [part="body"] {
+          column-count: 2;
+        }
+      }
+
+      @media screen and (max-width: 540px) {
+        [part="body"] {
+          column-count: 1;
+        }
+
+        [part="preview"] {
+          margin: 0px auto;
+        }
       }
     `;
   }
@@ -108,6 +189,8 @@ export class DeckList extends StateElement {
     const queries = [];
 
     for (let i = 0; i < chunks; i++) {
+      // TODO: construct list of SearchModels to be used for card cache
+
       queries.push({
         identifiers: allCards.slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1)).map(x => {
           // Note: Scryfall doesn't seem to support all mtgo ids so avoid using those
@@ -156,21 +239,47 @@ export class DeckList extends StateElement {
         this.dispatch(setDecklist(data, list));
         this.dispatch(setFetched(true));
         this.emitEvent('fetchList');
-
-        // TODO: set and use CardCache
       });
+  }
+
+  renderDeckSection(section, count = true) {
+    if (!section) {
+      return null;
+    }
+
+    return html`
+      <dl part='section'>
+        <dt part='section-title'>${section.title}${count ? ` (${section.cards.length})` : null}</dt>
+        ${section.cards.map(card => html`
+          <dd part='section-item'>
+            ${card.amount}x <a href='${card.url}' target='_blank' rel='nofollow noreferrer noopener'>${card.name}</a>
+          </dd>
+        `)}
+      </dl>
+    `;
   }
 
   render() {
     if (!this.state.fetched) {
       return html`
-        <p>LOADING</p>
+        <seer-loader></seer-loader>
       `;
     }
 
     return html`
       <div part='container'>
+        ${this.title ? html`<h2 part='title'>${this.title}</h2>` : null}
+        <div part='body'>
+          <div part='preview'>
+            ${this.state.previewImage ? html`<img part='preview-image' src='${this.state.previewImage}' alt='${this.state.previewName}' />`: null}
+          </div>
 
+          ${this.renderDeckSection(this.state.decklist.commander, false)}
+          ${this.renderDeckSection(this.state.decklist.companion, false)}
+          ${CARD_TYPE_ORDER.map(type => this.renderDeckSection(this.state.decklist[type.toLowerCase()]))}
+          ${this.state.decklist.sideboard ? html`<hr part='separator' />` : null}
+          ${this.renderDeckSection(this.state.decklist.sideboard, false)}
+        </div>
       </div>
     `;
   }

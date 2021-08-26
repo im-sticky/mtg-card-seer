@@ -17,6 +17,16 @@ export class CardInline extends Card {
 
   static get styles() {
     return css`
+      @keyframes fadein {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
       [part='container'] {
         display: inline-flex;
         flex-wrap: wrap;
@@ -32,6 +42,7 @@ export class CardInline extends Card {
         display: block;
         max-width: 100%;
         height: 100%;
+        animation: fadein 83ms ease-out;
       }
 
       [part='container'].wide [part="image"] {
