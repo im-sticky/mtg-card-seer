@@ -75,12 +75,20 @@ export class DeckList extends StateElement {
       }
 
       [part="section"] {
-        page-break-inside: avoid;
-        break-inside: avoid-column;
-        display: table;
         padding: 0.5rem;
         margin: 0;
         line-height: 1.5;
+      }
+
+      [part="section"]:not(.section--sideboard) {
+        page-break-inside: avoid;
+        break-inside: avoid-column;
+        display: table;
+      }
+
+      .section--sideboard [part="section-title"] {
+        padding: 0 0.5rem;
+        column-span: all;
       }
 
       [part="section-title"] {
@@ -240,13 +248,13 @@ export class DeckList extends StateElement {
       });
   }
 
-  renderDeckSection(section, count = true) {
+  renderDeckSection(section, count = true, classes = null) {
     if (!section) {
       return null;
     }
 
     return html`
-      <dl part='section'>
+      <dl part='section' class='${classes ?? ''}'>
         <dt part='section-title'>${section.title}${count ? ` (${section.cards.length})` : null}</dt>
         ${section.cards.map(card => html`
           <dd part='section-item'>
@@ -276,7 +284,7 @@ export class DeckList extends StateElement {
           ${this.renderDeckSection(this.state.decklist.companion, false)}
           ${CARD_TYPE_ORDER.map(type => this.renderDeckSection(this.state.decklist[type.toLowerCase()]))}
           ${this.state.decklist.sideboard ? html`<hr part='separator' />` : null}
-          ${this.renderDeckSection(this.state.decklist.sideboard, false)}
+          ${this.renderDeckSection(this.state.decklist.sideboard, false, 'section--sideboard')}
         </div>
       </div>
     `;
