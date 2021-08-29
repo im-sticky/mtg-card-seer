@@ -75,6 +75,14 @@ export class CardModel {
   get type() {
     return this.faces[0].type;
   }
+
+  /**
+   * Getter for front card face image.
+   * @returns {String} URL for front card face image.
+   */
+  get frontFace() {
+    return this.faces[0].image;
+  }
 }
 
 /**

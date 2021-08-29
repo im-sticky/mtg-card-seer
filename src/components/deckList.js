@@ -1,9 +1,9 @@
 import {html, css} from 'lit-element';
-import {classMap} from 'lit-html/directives/class-map';
 import {autoParse} from 'mtg-decklist-parser';
 import {createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
 import {DeckModel} from 'models/deck';
+import {isTouchEvent} from 'helpers/utility';
 import {
   MTGA_UNIQUE_SET_CODES,
   CARD_TYPE_ORDER,
@@ -17,6 +17,7 @@ import {
 const [SET_DECKLIST, setDecklist] = createAction('SET_DECKLIST', (type, scryfall, parser) => ({type, scryfall, parser}));
 const [SET_SOURCE, setSource] = createAction('SET_SOURCE');
 const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
+const [SET_PREVIEW, setPreview] = createAction('SET_PREVIEW');
 
 
 export class DeckList extends StateElement {
@@ -130,6 +131,7 @@ export class DeckList extends StateElement {
       decklist: undefined,
       source: undefined,
       fetched: false,
+      preview: undefined,
     };
 
     const handlers = {
@@ -144,6 +146,10 @@ export class DeckList extends StateElement {
       [SET_FETCHED]: (state, action) => ({
         ...state,
         fetched: action.value,
+      }),
+      [SET_PREVIEW]: (state, action) => ({
+        ...state,
+        preview: action.value,
       }),
     };
 
@@ -248,6 +254,37 @@ export class DeckList extends StateElement {
       });
   }
 
+  displayPreview(card) {
+    this.dispatch(setPreview(card));
+  }
+
+  handleMouseEnter(e, card) {
+    if (isTouchEvent(e)) {
+      e.preventDefault();
+      return;
+    }
+
+    this.displayPreview(card);
+  }
+
+  handleMobileTouch(e, card) {
+    if (isTouchEvent(e)) {
+      this.emitEvent('touchCard');
+
+      if (this.state.preview?.name !== card.name) {
+        e.preventDefault();
+
+        this.displayPreview(card);
+      }
+    }
+  }
+
+  onTabFocusIn(e, card) {
+    if (!isTouchEvent(e) && e.code === KEY_CODES.TAB) {
+      this.displayPreview(card);
+    }
+  }
+
   renderDeckSection(section, count = true, classes = null) {
     if (!section) {
       return null;
@@ -258,7 +295,15 @@ export class DeckList extends StateElement {
         <dt part='section-title'>${section.title}${count ? ` (${section.cards.length})` : null}</dt>
         ${section.cards.map(card => html`
           <dd part='section-item'>
-            ${card.amount}x <a href='${card.url}' target='_blank' rel='nofollow noreferrer noopener'>${card.name}</a>
+            ${card.amount}x <a
+              href='${card.url}'
+              target='_blank'
+              rel='nofollow noreferrer noopener'
+              @mouseenter=${e => this.handleMouseEnter(e, card)}
+              @click=${e => this.handleMobileTouch(e, card)}
+              @keyup=${e => this.onTabFocusIn(e, card)}>
+              ${card.name}
+            </a>
           </dd>
         `)}
       </dl>
@@ -277,7 +322,7 @@ export class DeckList extends StateElement {
         ${this.title ? html`<h2 part='title'>${this.title}</h2>` : null}
         <div part='body'>
           <div part='preview'>
-            ${this.state.previewImage ? html`<img part='preview-image' src='${this.state.previewImage}' alt='${this.state.previewName}' />`: null}
+            ${this.state.preview ? html`<img part='preview-image' src='${this.state.preview.frontFace}' alt='${this.state.preview.name}' />`: null}
           </div>
 
           ${this.renderDeckSection(this.state.decklist.commander, false)}
