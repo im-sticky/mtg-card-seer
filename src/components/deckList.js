@@ -186,28 +186,29 @@ export class DeckList extends StateElement {
     const queries = [];
 
     for (let i = 0; i < chunks; i++) {
-
-
       queries.push({
-        identifiers: allCards.slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1)).map(x => {
-          // Note: Scryfall doesn't seem to support all mtgo ids so avoid using those
-          // Note: MTGA Dominaria set has a unique set code that Scryfall does not handle properly.
-          if (x.collectors && x.set && !MTGA_UNIQUE_SET_CODES.includes(x.set.toUpperCase())) {
-            return {
-              set: x.set,
-              collector_number: x.collectors.toString(),
-            };
-          } else if (x.set && !MTGA_UNIQUE_SET_CODES.includes(x.set.toUpperCase())) {
+        identifiers: allCards
+          .slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1))
+          .filter(x => !CardCache.has(CardCache.createKey(x.name, x.set, x.collectors)))
+          .map(x => {
+            // Note: Scryfall doesn't seem to support all mtgo ids so avoid using those
+            // Note: MTGA Dominaria set has a unique set code that Scryfall does not handle properly.
+            if (x.collectors && x.set && !MTGA_UNIQUE_SET_CODES.includes(x.set.toUpperCase())) {
+              return {
+                set: x.set,
+                collector_number: x.collectors.toString(),
+              };
+            } else if (x.set && !MTGA_UNIQUE_SET_CODES.includes(x.set.toUpperCase())) {
+              return {
+                name: x.name,
+                set: x.set,
+              };
+            }
+
             return {
               name: x.name,
-              set: x.set,
             };
-          }
-
-          return {
-            name: x.name,
-          };
-        }),
+          }),
       });
     }
 

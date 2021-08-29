@@ -57,15 +57,23 @@ export class CardModel {
   }
 
   /**
-   * Constructs an array of all related price info.
+   * Getter that constructs an array of all related price info.
    * @returns {Array} All price info.
    */
-  prices() {
+  get prices() {
     return [
       this.usd,
       this.eur,
       this.tix,
     ];
+  }
+
+  /**
+   * Getter for retrieving type of card based on front face.
+   * @returns {String} Type of card.
+   */
+  get type() {
+    return this.faces[0].type;
   }
 }
 
@@ -94,21 +102,24 @@ export class FaceModel {
    * initializes model properties.
    * @param {String} name Name of the card face.
    * @param {String} image URL of card face image.
+   * @param {String} type Typeline of the face.
    */
-  constructor({name, image}) {
+  constructor({name, image, type}) {
     this.name = name;
     this.image = image;
+    this.type = type;
   }
 
   /**
    * Static method to be used for creating a new FaceModel from a Scryfall API response object.
-   * @param {any} scryfall
-   * @returns {any}
+   * @param {Object} scryfall Scryfall API response object.
+   * @returns {FaceModel} New FaceModel object.
    */
   static fromApi(scryfall) {
     return new this({
       name: scryfall.name,
       image: scryfall.image_uris.normal,
+      type: scryfall.type_line,
     });
   }
 }

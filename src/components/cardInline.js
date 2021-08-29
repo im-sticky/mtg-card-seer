@@ -103,7 +103,7 @@ export class CardInline extends Card {
       ${this.displayFaces.map(face => html`<img part='image' src='${face.image}' alt='${face.name}' />`)}
       ${this.priceInfo ? html`
         <ul part='price-list'>
-          ${this.state.cardInfo.prices().map(price => price.price ? html`
+          ${this.state.cardInfo.prices.map(price => price.price ? html`
             <li part='price-item'>
               <a part='price-link' href='${price.url}' target='_blank' rel='nofollow noreferrer noopener'>
                 ${price.symbol}${price.price}

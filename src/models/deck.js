@@ -35,20 +35,38 @@ export class DeckModel {
     };
 
     parserList.deck.forEach(card => {
+      const cacheKey = CardCache.createKey(card.name, card.set, card.collectors);
+      let cacheCard;
+
+      if (CardCache.has(cacheKey)) {
+        cacheCard = CardCache.get(cacheKey);
+      }
+
       const scryfallCard = scryfallList.find(x => x.name.startsWith(card.name));
 
-      if (!scryfallCard) {
+      if (!scryfallCard && !cacheCard) {
         return;
       }
 
       CARD_TYPE_PRECEDENCE.some(type => {
         // for double faced cards use the front face to determine type
-        var matchAgainst = DOUBLE_SIDED_LAYOUTS.includes(scryfallCard.layout) ?
-          scryfallCard.card_faces[0].type_line :
-          scryfallCard.type_line;
+        var matchAgainst = cacheCard ?
+          cacheCard.type :
+          DOUBLE_SIDED_LAYOUTS.includes(scryfallCard.layout) ?
+            scryfallCard.card_faces[0].type_line :
+            scryfallCard.type_line;
 
         if (matchAgainst.match(new RegExp(type, 'i'))) {
-          sections[type].push(CardModel.fromApi(scryfallCard, card.amount));
+          if (cacheCard) {
+            sections[type].push(cacheCard);
+
+            return true;
+          }
+
+          const cardModel = CardModel.fromApi(scryfallCard, card.amount);
+
+          sections[type].push(cardModel);
+          CardCache.set(cacheKey, cardModel);
 
           return true;
         }
@@ -84,6 +102,6 @@ export class DeckModel {
 export class DeckSectionModel {
   constructor({title, cards}) {
     this.title = title;
-    this.cards = Array.isArray(cards) ? cards : [cards];
+    this.cards = Array.isArray(cards) ? cards.sort((a, b) => a.name > b.name ? 1 : -1) : [cards];
   }
 }
