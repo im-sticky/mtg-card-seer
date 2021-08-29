@@ -1,3 +1,5 @@
+import MurmurHash3 from 'imurmurhash';
+
 const _cache = new Map();
 
 /**
@@ -6,28 +8,42 @@ const _cache = new Map();
 export class CardCache {
   /**
    * Sets a cache value at a specific key.
-   * @param {SearchModel} search Model of the search used to retrieve the data from Scryfall.
+   * @param {Number} key Key to set cache at.
    * @param {any} value Data to be cached.
    */
-  static set(search, value) {
-    _cache.set(search.cacheKey, value);
+  static set(key, value) {
+    _cache.set(key, value);
   }
 
   /**
    * Retrieves a cached value based on a Scryfall search.
-   * @param {SearchModel} search Model of the Scryfall search to get cached data from.
+   * @param {Number} key Key to get from cache.
    * @returns {any} The cached data.
    */
-  static get(search) {
-    return _cache.get(search.cacheKey);
+  static get(key) {
+    return _cache.get(key);
   }
 
   /**
    * Checks if the cache has set data at a specific key.
-   * @param {SearchModel} search Model of the Scryfall search to test.
+   * @param {Number} key Key to check for in cache.
    * @returns {Boolean} True if the cache contains the key.
    */
-  static has(search) {
-    return _cache.has(search.cacheKey);
+  static has(key) {
+    return _cache.has(key);
+  }
+
+  /**
+   * Creates a hashed key from a cards values to be used within the cache.
+   * @param {String} name Name used for card.
+   * @param {String} set Set of the card, optional.
+   * @param {String|Number} collector Collector number of the card, optional.
+   * @returns {Number} 32 bit hash.
+   */
+  static createKey(name, set = '', collector = '') {
+    return MurmurHash3(name.toLowerCase())
+      .hash(set?.toLowerCase() ?? '')
+      .hash(collector?.toString() ?? '')
+      .result();
   }
 }

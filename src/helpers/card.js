@@ -131,8 +131,8 @@ export class Card extends StateElement {
       return;
     }
 
-    if (CardCache.has(this.state.search)) {
-      const info = CardCache.get(this.state.search);
+    if (CardCache.has(this.state.search.cacheKey)) {
+      const info = CardCache.get(this.state.search.cacheKey);
 
       this.dispatch(setCardInfo(info));
     } else {
@@ -164,7 +164,7 @@ export class Card extends StateElement {
 
           const info = CardModel.fromApi(resp);
 
-          CardCache.set(this.state.search, info);
+          CardCache.set(this.state.search.cacheKey, info);
 
           this.dispatch(setCardInfo(info));
           this.emitEvent('fetchCard');

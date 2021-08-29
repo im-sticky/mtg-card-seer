@@ -1,5 +1,4 @@
 import {CardModel} from './card';
-import {SearchModel} from './search';
 import {CardCache} from 'helpers/cache';
 import {CARD_TYPES, CARD_TYPE_PRECEDENCE, DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 

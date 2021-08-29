@@ -2,18 +2,15 @@ import {html, css} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
 import {autoParse} from 'mtg-decklist-parser';
 import {createAction, StateElement} from 'helpers/store';
-import {SearchModel} from 'models/search';
+import {CardCache} from 'helpers/cache';
 import {DeckModel} from 'models/deck';
 import {
   MTGA_UNIQUE_SET_CODES,
   CARD_TYPE_ORDER,
   CARD_WIDTH,
-  CARD_WIDTH_MOBILE,
   CARD_HEIGHT,
-  CARD_HEIGHT_MOBILE,
   MOBILE_WIDTH,
   KEY_CODES,
-  PRIMARY_COLOR,
 } from 'helpers/constants';
 
 
@@ -189,7 +186,7 @@ export class DeckList extends StateElement {
     const queries = [];
 
     for (let i = 0; i < chunks; i++) {
-      // TODO: construct list of SearchModels to be used for card cache
+
 
       queries.push({
         identifiers: allCards.slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1)).map(x => {

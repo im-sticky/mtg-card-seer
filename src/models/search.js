@@ -1,3 +1,5 @@
+import {CardCache} from 'helpers/cache';
+
 /**
  * Model used for building an object specific to fetching data from Scryfall and the local cache.
  */
@@ -19,32 +21,6 @@ export class SearchModel {
    * @returns {String} Normalized key for the cache.
    */
   get cacheKey() {
-    const setKey = this.appendKey(this.set);
-    const collectorNum = this.appendKey(this.collector);
-
-    return this.normalizeValue(this.fuzzy) + setKey + collectorNum;
-  }
-
-  /**
-   * Creates a lowercase dash separated value based on a given value.
-   * @param {any} value Value to create normalized string for.
-   * @returns {String} Normalized string.
-   */
-  normalizeValue(value) {
-    switch (typeof value) {
-      case 'string':
-        return value.trim().toLowerCase().replace(/ /g, '_');
-      default:
-        return value;
-    }
-  }
-
-  /**
-   * Creates a normalized string to be appended to another.
-   * @param {any} value Value to be appended to a list of normalized values.
-   * @returns {any} Normalized value preceded by a dash.
-   */
-  appendKey(value) {
-    return value ? `-${this.normalizeValue(value)}` : '';
+    return CardCache.createKey(this.fuzzy, this.set, this.collector);
   }
 }
