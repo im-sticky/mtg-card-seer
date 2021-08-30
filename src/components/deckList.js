@@ -1,4 +1,4 @@
-import {html, css, TemplateResult} from 'lit-element';
+import {html, css} from 'lit-element';
 import {autoParse} from 'mtg-decklist-parser';
 import {createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
@@ -28,6 +28,10 @@ export class DeckList extends StateElement {
       hidePreview: {
         type: Boolean,
         attribute: 'hide-preview',
+      },
+      exportButtons: {
+        type: Boolean,
+        attribute: 'export-buttons',
       },
       title: {
         type: String,
@@ -59,9 +63,38 @@ export class DeckList extends StateElement {
         max-width: 840px;
       }
 
+      [part="header"] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+
       [part="title"] {
         text-align: center;
-        margin: 0 0 1rem 0;
+        margin: 0;
+      }
+
+      [part="export"] {
+        display: inline-block;
+        border: none;
+        padding: 0.5rem 1rem;
+        background: #551a8b;
+        color: #fff;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border-radius: 3px;
+        appearance: none;
+        transition: background 166ms ease-out;
+      }
+
+      [part="export"]:hover,
+      [part="export"]:focus {
+        background: #343242;
+      }
+
+      [part="export"] + [part="export"] {
+        margin-left: 0.5rem;
       }
 
       [part="body"] {
@@ -109,7 +142,7 @@ export class DeckList extends StateElement {
 
       [part="separator"] {
         column-span: all;
-        border-top: 1px solid #000;
+        border-top: 1px solid #551a8b;
       }
 
       @media screen and (max-width: ${MOBILE_WIDTH - 1}px) {
@@ -137,6 +170,7 @@ export class DeckList extends StateElement {
     super();
 
     this.hidePreview = false;
+    this.exportButtons = false;
 
     const state = {
       decklist: undefined,
@@ -372,7 +406,16 @@ export class DeckList extends StateElement {
 
     return html`
       <div part='container'>
-        ${this.title ? html`<h2 part='title'>${this.title}</h2>` : null}
+        ${this.title || this.exportButtons ? html`
+          <div part='header'>
+            ${this.title ? html`<h2 part='title'>${this.title}</h2>` : null}
+            ${this.exportButtons ? html`
+              <button type='button' part='export'>Arena</button>
+              <button type='button' part='export'>MTGO</button>
+            ` : null}
+          </div>
+        ` : null}
+
         <div part='body'>
           ${!this.hidePreview ? html`<div part='preview'>
             ${this.state.preview ? html`<img part='preview-image' src='${this.state.preview.frontFace}' alt='${this.state.preview.name}' />`: null}
