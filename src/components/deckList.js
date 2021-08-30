@@ -1,4 +1,4 @@
-import {html, css} from 'lit-element';
+import {html, css, TemplateResult} from 'lit-element';
 import {autoParse} from 'mtg-decklist-parser';
 import {createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
@@ -19,10 +19,16 @@ const [SET_SOURCE, setSource] = createAction('SET_SOURCE');
 const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 const [SET_PREVIEW, setPreview] = createAction('SET_PREVIEW');
 
-
+/**
+ * Component for rendering entire decklists with an image preview.
+ */
 export class DeckList extends StateElement {
   static get properties() {
     return {
+      hidePreview: {
+        type: Boolean,
+        attribute: 'hide-preview',
+      },
       title: {
         type: String,
       },
@@ -124,8 +130,13 @@ export class DeckList extends StateElement {
     `;
   }
 
+  /**
+   * Initializes component with state and reducer actions, as well as fetching the cards from scryfall.
+   */
   constructor() {
     super();
+
+    this.hidePreview = false;
 
     const state = {
       decklist: undefined,
@@ -157,12 +168,20 @@ export class DeckList extends StateElement {
     this.fetchCards(this.textContent);
   }
 
+  /**
+   * Setter for src attribute, will attempt to fetch external file.
+   * @param {String} newVal New attribute value.
+   */
   set src(newVal) {
     if (newVal !== this.state.source) {
       this.fetchExternalList(newVal);
     }
   }
 
+  /**
+   * Will fetch external file and then fetch from Scryfall API based on its contents.
+   * @param {String} src File URL path.
+   */
   fetchExternalList(src) {
     fetch(src)
       .then(resp => {
@@ -181,6 +200,10 @@ export class DeckList extends StateElement {
       });
   }
 
+  /**
+   * Fetches cards from scryfall API and sets decklist from those results.
+   * @param {String} rawDecklist Raw newline delimited decklist string based ont MTGO or MTGA format.
+   */
   fetchCards(rawDecklist) {
     const list = rawDecklist.trim() ? autoParse(rawDecklist) : undefined;
 
@@ -254,10 +277,19 @@ export class DeckList extends StateElement {
       });
   }
 
+  /**
+   * Sets a card to be seen in the preview.
+   * @param {CardModel} card Card to set as preview.
+   */
   displayPreview(card) {
     this.dispatch(setPreview(card));
   }
 
+  /**
+   * Attempts to set the card as the preview based on the dispatched hover event.
+   * @param {Event} e JS event dispatched from link.
+   * @param {CardModel} card Card to set for preview.
+   */
   handleMouseEnter(e, card) {
     if (isTouchEvent(e)) {
       e.preventDefault();
@@ -267,11 +299,16 @@ export class DeckList extends StateElement {
     this.displayPreview(card);
   }
 
+  /**
+   * Attempts to set the card as the preview based on the dispatched touch event.
+   * @param {Event} e JS event dispatched from link.
+   * @param {CardModel} card Card to set for preview.
+   */
   handleMobileTouch(e, card) {
     if (isTouchEvent(e)) {
       this.emitEvent('touchCard');
 
-      if (this.state.preview?.name !== card.name) {
+      if (this.state.preview?.name !== card.name && !this.hidePreview) {
         e.preventDefault();
 
         this.displayPreview(card);
@@ -279,12 +316,24 @@ export class DeckList extends StateElement {
     }
   }
 
+  /**
+   * Attempts to set the card as the preview based on the dispatched keyboard event.
+   * @param {Event} e JS event dispatched from link.
+   * @param {CardModel} card Card to set for preview.
+   */
   onTabFocusIn(e, card) {
     if (!isTouchEvent(e) && e.code === KEY_CODES.TAB) {
       this.displayPreview(card);
     }
   }
 
+  /**
+   * Renders a section of cards within the decklist.
+   * @param {DeckSectionModel} section Section of cards to render.
+   * @param {Number} count Total card count to display next to section title.
+   * @param {String} classes Optional additional CSS classes to add to container element.
+   * @returns {TemplateResult} LitHtml template.
+   */
   renderDeckSection(section, count = true, classes = null) {
     if (!section) {
       return null;
@@ -310,6 +359,10 @@ export class DeckList extends StateElement {
     `;
   }
 
+  /**
+   * LitElement lifecycle method for rendering HTML to DOM.
+   * @returns {TemplateResult} LitHtml template.
+   */
   render() {
     if (!this.state.fetched) {
       return html`
@@ -321,9 +374,9 @@ export class DeckList extends StateElement {
       <div part='container'>
         ${this.title ? html`<h2 part='title'>${this.title}</h2>` : null}
         <div part='body'>
-          <div part='preview'>
+          ${!this.hidePreview ? html`<div part='preview'>
             ${this.state.preview ? html`<img part='preview-image' src='${this.state.preview.frontFace}' alt='${this.state.preview.name}' />`: null}
-          </div>
+          </div>` : null}
 
           ${this.renderDeckSection(this.state.decklist.commander, false)}
           ${this.renderDeckSection(this.state.decklist.companion, false)}

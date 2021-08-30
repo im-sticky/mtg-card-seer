@@ -159,7 +159,7 @@ This component uses the Shadow DOM and requires to be styled using specific [::p
 - [x] ~~add proper mobile support for `card-link`~~
 - [ ] add a11y preview mode for `card-link`
 - [x] ~~add inline card preview component~~
-- [ ] add decklist component
+- [x] ~~add decklist component~~
 - [ ] decklist component visual view
 - [ ] add sideboard cuts/adds component
 - [ ] multilingual support

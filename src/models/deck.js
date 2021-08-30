@@ -6,6 +6,19 @@ import {CARD_TYPES, CARD_TYPE_PRECEDENCE, DOUBLE_SIDED_LAYOUTS} from 'helpers/co
  * Model used for managing deck object data in decklist based components.
  */
 export class DeckModel {
+  /**
+   * Initializes the model with all relevant deck list section data.
+   * @param {Array} instant Array of CardModels in the Instant section.
+   * @param {Array} sorcery Array of CardModels in the Sorcery section.
+   * @param {Array} artifact Array of CardModels in the Artifact section.
+   * @param {Array} creature Array of CardModels in the Creature section.
+   * @param {Array} enchantment Array of CardModels in the Enchantment section.
+   * @param {Array} land Array of CardModels in the Land section.
+   * @param {Array} planeswalker Array of CardModels in the Planeswalker section.
+   * @param {CardModel} commander
+   * @param {CardModel} companion
+   * @param {Array} sideboard Array of CardModels in the Sideboard section.
+   */
   constructor({instant, sorcery, artifact, creature, enchantment, land, planeswalker, commander, companion, sideboard}) {
     this.instant = this.toSection(CARD_TYPES.instant, instant);
     this.sorcery = this.toSection(CARD_TYPES.sorcery, sorcery);
@@ -19,6 +32,12 @@ export class DeckModel {
     this.sideboard = this.toSection('Sideboard', sideboard);
   }
 
+  /**
+   * Static method to be used for creating a new DeckModel based on the results from the Scryfall API and the raw deck input.
+   * @param {Array} scryfallList List of card response data from Scryfall.
+   * @param {Array} parserList List of models from mtg-decklist-parser.
+   * @returns {DeckModel} new DeckModel with all sections initialized.
+   */
   static fromApi(scryfallList, parserList) {
     const sections = {
       [CARD_TYPES.creature]: [],
@@ -91,6 +110,12 @@ export class DeckModel {
     });
   }
 
+  /**
+   * Creates a new deck section from a list of cards.
+   * @param {String} title Title of the section.
+   * @param {Array} cards Cards within the section. May be empty.
+   * @returns {DeckSectionModel} New model or undefined.
+   */
   toSection(title, cards) {
     return cards ? new DeckSectionModel({title, cards}) : undefined;
   }
@@ -100,6 +125,11 @@ export class DeckModel {
  * Model for a deck section to be used with DeckModel.
  */
 export class DeckSectionModel {
+  /**
+   * Initializes the model with all relevant section data.
+   * @param {String} title Title that represents the section.
+   * @param {Array} cards List of CardModels.
+   */
   constructor({title, cards}) {
     this.title = title;
     this.cards = Array.isArray(cards) ? cards.sort((a, b) => a.name > b.name ? 1 : -1) : [cards];
