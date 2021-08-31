@@ -64,6 +64,11 @@ export const MTGA_UNIQUE_SET_CODES = [
   'DAR',
 ];
 
+export const EXPORT_MODE = {
+  arena: 'arena',
+  mtgo: 'mtgo',
+};
+
 export const CARD_WIDTH = 222;
 export const CARD_WIDTH_MOBILE = CARD_WIDTH * 0.8;
 export const CARD_HEIGHT = 310;

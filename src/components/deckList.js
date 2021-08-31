@@ -11,13 +11,16 @@ import {
   CARD_HEIGHT,
   MOBILE_WIDTH,
   KEY_CODES,
+  EXPORT_MODE,
 } from 'helpers/constants';
 
+const NOTIFICATION_TIMING = 3000;
 
 const [SET_DECKLIST, setDecklist] = createAction('SET_DECKLIST', (type, scryfall, parser) => ({type, scryfall, parser}));
 const [SET_SOURCE, setSource] = createAction('SET_SOURCE');
 const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 const [SET_PREVIEW, setPreview] = createAction('SET_PREVIEW');
+const [SET_EXPORT_NOTIFICATION, setExportNotification] = createAction('SET_EXPORT_NOTIFICATION');
 
 /**
  * Component for rendering entire decklists with an image preview.
@@ -54,6 +57,16 @@ export class DeckList extends StateElement {
         }
       }
 
+      @keyframes fadeout {
+        from {
+          opacity: 1;
+        }
+
+        to {
+          opacity: 0;
+        }
+      }
+
       seer-loader {
         display: block;
       }
@@ -65,14 +78,13 @@ export class DeckList extends StateElement {
 
       [part="header"] {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        align-items: flex-start;
         margin-bottom: 1rem;
       }
 
       [part="title"] {
-        text-align: center;
         margin: 0;
+        padding-right: 1rem;
       }
 
       [part="export"] {
@@ -95,6 +107,24 @@ export class DeckList extends StateElement {
 
       [part="export"] + [part="export"] {
         margin-left: 0.5rem;
+      }
+
+      [part="export"]:first-of-type {
+        margin-left: auto;
+      }
+
+      [part="export-notification"] {
+        color: #75986E;
+        font-size: 0.875rem;
+        margin: 0 0 0 auto;
+        padding: 8px 0;
+        font-style: italic;
+        animation: fadein 83ms cubic-bezier(0.25, 1, 0.5, 1),
+          fadeout ${NOTIFICATION_TIMING / 2}ms linear ${NOTIFICATION_TIMING / 2}ms;
+      }
+
+      [part="export-notification"] + [part="export"] {
+        margin-left: 1rem;
       }
 
       [part="body"] {
@@ -174,15 +204,18 @@ export class DeckList extends StateElement {
 
     const state = {
       decklist: undefined,
+      parsedList: undefined,
       source: undefined,
       fetched: false,
       preview: undefined,
+      exportNotification: undefined,
     };
 
     const handlers = {
       [SET_DECKLIST]: (state, action) => ({
         ...state,
         decklist: DeckModel.fromApi(action.scryfall, action.parser),
+        parsedList: this.exportButtons ? action.parser : undefined,
       }),
       [SET_SOURCE]: (state, action) => ({
         ...state,
@@ -195,6 +228,10 @@ export class DeckList extends StateElement {
       [SET_PREVIEW]: (state, action) => ({
         ...state,
         preview: action.value,
+      }),
+      [SET_EXPORT_NOTIFICATION]: (state, action) => ({
+        ...state,
+        exportNotification: action.value,
       }),
     };
 
@@ -375,7 +412,7 @@ export class DeckList extends StateElement {
 
     return html`
       <dl part='section' class='${classes ?? ''}'>
-        <dt part='section-title'>${section.title}${count ? ` (${section.cards.length})` : null}</dt>
+        <dt part='section-title'>${section.title}${count ? ` (${section.cards.reduce((acc, x) => acc + x.amount, 0)})` : null}</dt>
         ${section.cards.map(card => html`
           <dd part='section-item'>
             ${card.amount}x <a
@@ -391,6 +428,61 @@ export class DeckList extends StateElement {
         `)}
       </dl>
     `;
+  }
+
+  /**
+   * Exports the deck to a specific format based on the given mode.
+   * @param {String} mode One of a constant value.
+   */
+  exportDeck(mode) {
+    // IMPORTANT: new line is intentional
+    const toInfo = card => `${card.amount} ${card.name}\n`;
+    let textDeck = '';
+
+    if (mode === EXPORT_MODE.arena) {
+      if (this.state.parsedList.commander) {
+        textDeck += `Commander\n${toInfo(this.state.parsedList.commander)}\n`;
+      } else if (this.state.parsedList.companion) {
+        textDeck += `Companion\n${toInfo(this.state.parsedList.companion)}\n`;
+      }
+
+      textDeck += 'Deck\n';
+    }
+
+    this.state.parsedList.deck.forEach(x => textDeck += toInfo(x));
+
+    if (this.state.parsedList.sideboard.length > 0) {
+      if (mode === EXPORT_MODE.arena) {
+        textDeck += '\nSideboard';
+      }
+
+      textDeck += '\n';
+      this.state.parsedList.sideboard.forEach(x => textDeck += toInfo(x));
+    }
+
+    if (mode === EXPORT_MODE.mtgo && this.state.parsedList.commander) {
+      textDeck += `\n${toInfo(this.state.parsedList.commander)}`;
+    }
+
+    switch (mode) {
+      case EXPORT_MODE.mtgo:
+        // eslint-disable-next-line no-case-declarations
+        let download = document.createElement('a');
+
+        download.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textDeck));
+        download.setAttribute('download', this.title ? `${this.title}.txt` : 'deck.txt');
+        download.style.display = 'none';
+
+        document.body.appendChild(download);
+        download.click();
+        document.body.removeChild(download);
+        break;
+      default:
+        navigator.clipboard.writeText(textDeck.trim()).then(() => {
+          this.dispatch(setExportNotification('Copied to clipboard'), () => setTimeout(() => this.dispatch(setExportNotification(undefined)), NOTIFICATION_TIMING));
+        });
+        break;
+    }
   }
 
   /**
@@ -410,8 +502,15 @@ export class DeckList extends StateElement {
           <div part='header'>
             ${this.title ? html`<h2 part='title'>${this.title}</h2>` : null}
             ${this.exportButtons ? html`
-              <button type='button' part='export'>Arena</button>
-              <button type='button' part='export'>MTGO</button>
+              ${this.state.exportNotification ? html`
+                <p part='export-notification'>${this.state.exportNotification}</p>
+              ` : null}
+              <button type='button' part='export' @click=${() => this.exportDeck(EXPORT_MODE.arena)}>
+                Arena
+              </button>
+              <button type='button' part='export' @click=${() => this.exportDeck(EXPORT_MODE.mtgo)}>
+                MTGO
+              </button>
             ` : null}
           </div>
         ` : null}
