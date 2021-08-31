@@ -36,7 +36,7 @@ export class DeckList extends StateElement {
         type: Boolean,
         attribute: 'export-buttons',
       },
-      title: {
+      heading: {
         type: String,
       },
       src: {
@@ -82,7 +82,7 @@ export class DeckList extends StateElement {
         margin-bottom: 1rem;
       }
 
-      [part="title"] {
+      [part="heading"] {
         margin: 0;
         padding-right: 1rem;
       }
@@ -435,7 +435,7 @@ export class DeckList extends StateElement {
    * @param {String} mode One of a constant value.
    */
   exportDeck(mode) {
-    // IMPORTANT: new line is intentional
+    // IMPORTANT: new lines are intentional
     const toInfo = card => `${card.amount} ${card.name}\n`;
     let textDeck = '';
 
@@ -470,7 +470,7 @@ export class DeckList extends StateElement {
         let download = document.createElement('a');
 
         download.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textDeck));
-        download.setAttribute('download', this.title ? `${this.title}.txt` : 'deck.txt');
+        download.setAttribute('download', this.heading ? `${this.heading}.txt` : 'deck.txt');
         download.style.display = 'none';
 
         document.body.appendChild(download);
@@ -498,9 +498,9 @@ export class DeckList extends StateElement {
 
     return html`
       <div part='container'>
-        ${this.title || this.exportButtons ? html`
+        ${this.heading || this.exportButtons ? html`
           <div part='header'>
-            ${this.title ? html`<h2 part='title'>${this.title}</h2>` : null}
+            ${this.heading ? html`<h2 part='heading'>${this.heading}</h2>` : null}
             ${this.exportButtons ? html`
               ${this.state.exportNotification ? html`
                 <p part='export-notification'>${this.state.exportNotification}</p>
