@@ -32,12 +32,16 @@ export class DeckList extends StateElement {
         type: Boolean,
         attribute: 'hide-preview',
       },
-      exportButtons: {
+      hideExport: {
         type: Boolean,
-        attribute: 'export-buttons',
+        attribute: 'hide-export',
       },
       heading: {
         type: String,
+      },
+      inlineSideboard: {
+        type: Boolean,
+        attribute: 'inline-sideboard',
       },
       src: {
         type: String,
@@ -200,7 +204,8 @@ export class DeckList extends StateElement {
     super();
 
     this.hidePreview = false;
-    this.exportButtons = false;
+    this.hideExport = false;
+    this.inlineSideboard = false;
 
     const state = {
       decklist: undefined,
@@ -215,7 +220,7 @@ export class DeckList extends StateElement {
       [SET_DECKLIST]: (state, action) => ({
         ...state,
         decklist: DeckModel.fromApi(action.scryfall, action.parser),
-        parsedList: this.exportButtons ? action.parser : undefined,
+        parsedList: !this.hideExport ? action.parser : undefined,
       }),
       [SET_SOURCE]: (state, action) => ({
         ...state,
@@ -401,18 +406,17 @@ export class DeckList extends StateElement {
   /**
    * Renders a section of cards within the decklist.
    * @param {DeckSectionModel} section Section of cards to render.
-   * @param {Number} count Total card count to display next to section title.
    * @param {String} classes Optional additional CSS classes to add to container element.
    * @returns {TemplateResult} LitHtml template.
    */
-  renderDeckSection(section, count = true, classes = null) {
+  renderDeckSection(section, classes = null) {
     if (!section) {
       return null;
     }
 
     return html`
       <dl part='section' class='${classes ?? ''}'>
-        <dt part='section-title'>${section.title}${count ? ` (${section.cards.reduce((acc, x) => acc + x.amount, 0)})` : null}</dt>
+        <dt part='section-title'>${section.title} (${section.cards.reduce((acc, x) => acc + x.amount, 0)})</dt>
         ${section.cards.map(card => html`
           <dd part='section-item'>
             ${card.amount}x <a
@@ -498,10 +502,10 @@ export class DeckList extends StateElement {
 
     return html`
       <div part='container'>
-        ${this.heading || this.exportButtons ? html`
+        ${this.heading || !this.hideExport ? html`
           <div part='header'>
             ${this.heading ? html`<h2 part='heading'>${this.heading}</h2>` : null}
-            ${this.exportButtons ? html`
+            ${!this.hideExport ? html`
               ${this.state.exportNotification ? html`
                 <p part='export-notification'>${this.state.exportNotification}</p>
               ` : null}
@@ -520,11 +524,11 @@ export class DeckList extends StateElement {
             ${this.state.preview ? html`<img part='preview-image' src='${this.state.preview.frontFace}' alt='${this.state.preview.name}' />`: null}
           </div>` : null}
 
-          ${this.renderDeckSection(this.state.decklist.commander, false)}
-          ${this.renderDeckSection(this.state.decklist.companion, false)}
+          ${this.renderDeckSection(this.state.decklist.commander)}
+          ${this.renderDeckSection(this.state.decklist.companion)}
           ${CARD_TYPE_ORDER.map(type => this.renderDeckSection(this.state.decklist[type.toLowerCase()]))}
-          ${this.state.decklist.sideboard ? html`<hr part='separator' />` : null}
-          ${this.renderDeckSection(this.state.decklist.sideboard, false, 'section--sideboard')}
+          ${this.state.decklist.sideboard && this.inlineSideboard ? html`<hr part='separator' />` : null}
+          ${this.renderDeckSection(this.state.decklist.sideboard, this.inlineSideboard ? 'section--sideboard' : null)}
         </div>
       </div>
     `;
