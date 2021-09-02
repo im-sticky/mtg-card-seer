@@ -1,4 +1,5 @@
 import {html, css} from 'lit-element';
+import {classMap} from 'lit-html/directives/class-map';
 import {autoParse} from 'mtg-decklist-parser';
 import {createAction, StateElement} from 'helpers/store';
 import {CardCache} from 'helpers/cache';
@@ -21,6 +22,7 @@ const [SET_SOURCE, setSource] = createAction('SET_SOURCE');
 const [SET_FETCHED, setFetched] = createAction('SET_FETCHED');
 const [SET_PREVIEW, setPreview] = createAction('SET_PREVIEW');
 const [SET_EXPORT_NOTIFICATION, setExportNotification] = createAction('SET_EXPORT_NOTIFICATION');
+const [FLIP_PREVIEW, flipPreview] = createAction('FLIP_PREVIEW');
 
 /**
  * Component for rendering entire decklists with an image preview.
@@ -91,7 +93,7 @@ export class DeckList extends StateElement {
         padding-right: 1rem;
       }
 
-      [part="export"] {
+      .button {
         display: inline-block;
         border: none;
         padding: 0.5rem 1rem;
@@ -104,8 +106,13 @@ export class DeckList extends StateElement {
         transition: background 166ms ease-out;
       }
 
-      [part="export"]:hover,
-      [part="export"]:focus {
+      .button--small {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+      }
+
+      .button:hover,
+      .button:focus {
         background: #343242;
       }
 
@@ -135,17 +142,46 @@ export class DeckList extends StateElement {
         column-count: 3;
       }
 
+      .preview-perspective {
+        position: relative;
+        perspective: 1200px;
+        width: ${CARD_WIDTH};
+        height: ${CARD_HEIGHT};
+      }
+
       [part="preview"] {
         width: ${CARD_WIDTH};
         height: ${CARD_HEIGHT};
         background-image: url(https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=0&type=card);
         background-size: 100% auto;
         background-repeat: no-repeat;
+        position: relative;
+        transition: transform 560ms ease-in-out;
+        transform-style: preserve-3d;
+      }
+
+      [part="preview"].flipped {
+        transform: rotateY(180deg);
       }
 
       [part="preview-image"] {
         width: 100%;
         height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+
+      [part="preview-image"] + [part="preview-image"] {
+        transform: rotateY(180deg);
+      }
+
+      [part="flip-preview"] {
+        position: absolute;
+        z-index: 10;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
       }
 
       [part="section"] {
@@ -233,10 +269,15 @@ export class DeckList extends StateElement {
       [SET_PREVIEW]: (state, action) => ({
         ...state,
         preview: action.value,
+        flipPreview: false,
       }),
       [SET_EXPORT_NOTIFICATION]: (state, action) => ({
         ...state,
         exportNotification: action.value,
+      }),
+      [FLIP_PREVIEW]: state => ({
+        ...state,
+        flipPreview: !state.flipPreview,
       }),
     };
 
@@ -509,10 +550,10 @@ export class DeckList extends StateElement {
               ${this.state.exportNotification ? html`
                 <p part='export-notification'>${this.state.exportNotification}</p>
               ` : null}
-              <button type='button' part='export' @click=${() => this.exportDeck(EXPORT_MODE.arena)}>
+              <button type='button' part='export' class='button' @click=${() => this.exportDeck(EXPORT_MODE.arena)}>
                 Arena
               </button>
-              <button type='button' part='export' @click=${() => this.exportDeck(EXPORT_MODE.mtgo)}>
+              <button type='button' part='export' class='button' @click=${() => this.exportDeck(EXPORT_MODE.mtgo)}>
                 MTGO
               </button>
             ` : null}
@@ -520,9 +561,20 @@ export class DeckList extends StateElement {
         ` : null}
 
         <div part='body'>
-          ${!this.hidePreview ? html`<div part='preview'>
-            ${this.state.preview ? html`<img part='preview-image' src='${this.state.preview.frontFace}' alt='${this.state.preview.name}' />`: null}
-          </div>` : null}
+          ${!this.hidePreview ? html`
+            <div class='preview-perspective'>
+              <div part='preview' class='${classMap({'flipped': this.state.flipPreview})}'>
+              ${this.state.preview ? this.state.preview.faces.map(x => html`
+              <img part='preview-image' src='${x.image}' alt='${x.name}' />
+              `) : null}
+              </div>
+              ${this.state.preview?.faces.length > 1 ? html`
+                <button type='button' part='flip-preview' class='button button--small' @click=${() => this.dispatch(flipPreview())}>
+                  Turn Over
+                </button>
+              ` : null}
+            </div>
+          ` : null}
 
           ${this.renderDeckSection(this.state.decklist.commander)}
           ${this.renderDeckSection(this.state.decklist.companion)}
