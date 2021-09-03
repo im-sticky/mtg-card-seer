@@ -405,7 +405,9 @@ export class DeckList extends StateElement {
    * @param {CardModel} card Card to set as preview.
    */
   displayPreview(card) {
-    this.dispatch(setPreview(card));
+    if (!this.hidePreview) {
+      this.dispatch(setPreview(card), () => this.emitEvent('previewChange'));
+    }
   }
 
   /**
@@ -448,37 +450,6 @@ export class DeckList extends StateElement {
     if (!isTouchEvent(e) && e.code === KEY_CODES.TAB) {
       this.displayPreview(card);
     }
-  }
-
-  /**
-   * Renders a section of cards within the decklist.
-   * @param {DeckSectionModel} section Section of cards to render.
-   * @param {String} classes Optional additional CSS classes to add to container element.
-   * @returns {TemplateResult} LitHtml template.
-   */
-  renderDeckSection(section, classes = null) {
-    if (!section) {
-      return null;
-    }
-
-    return html`
-      <dl part='section' class='${classes ?? ''}'>
-        <dt part='section-title'>${section.title} (${section.cards.reduce((acc, x) => acc + x.amount, 0)})</dt>
-        ${section.cards.map(card => html`
-          <dd part='section-item'>
-            ${card.amount}x <a
-              href='${card.url}'
-              target='_blank'
-              rel='nofollow noreferrer noopener'
-              @mouseenter=${e => this.handleMouseEnter(e, card)}
-              @click=${e => this.handleMobileTouch(e, card)}
-              @keyup=${e => this.onTabFocusIn(e, card)}>
-              ${card.name}
-            </a>
-          </dd>
-        `)}
-      </dl>
-    `;
   }
 
   /**
@@ -534,6 +505,40 @@ export class DeckList extends StateElement {
         });
         break;
     }
+
+    this.emitEvent('deckExported');
+  }
+
+  /**
+   * Renders a section of cards within the decklist.
+   * @param {DeckSectionModel} section Section of cards to render.
+   * @param {String} classes Optional additional CSS classes to add to container element.
+   * @returns {TemplateResult} LitHtml template.
+   */
+  renderDeckSection(section, classes = null) {
+    if (!section) {
+      return null;
+    }
+
+    return html`
+      <dl part='section' class='${classes ?? ''}'>
+        <dt part='section-title'>${section.title} (${section.cards.reduce((acc, x) => acc + x.amount, 0)})</dt>
+        ${section.cards.map(card => html`
+          <dd part='section-item'>
+            ${card.amount}x <a
+              href='${card.url}'
+              target='_blank'
+              rel='nofollow noreferrer noopener'
+              part='link'
+              @mouseenter=${e => this.handleMouseEnter(e, card)}
+              @click=${e => this.handleMobileTouch(e, card)}
+              @keyup=${e => this.onTabFocusIn(e, card)}>
+              ${card.name}
+            </a>
+          </dd>
+        `)}
+      </dl>
+    `;
   }
 
   /**
@@ -585,8 +590,8 @@ export class DeckList extends StateElement {
           ${this.renderDeckSection(this.state.decklist.commander)}
           ${this.renderDeckSection(this.state.decklist.companion)}
           ${CARD_TYPE_ORDER.map(type => this.renderDeckSection(this.state.decklist[type.toLowerCase()]))}
-          ${this.state.decklist.sideboard && this.inlineSideboard ? html`<hr part='separator' />` : null}
-          ${this.renderDeckSection(this.state.decklist.sideboard, this.inlineSideboard ? 'section--sideboard' : null)}
+          ${this.state.decklist.sideboard && !this.inlineSideboard ? html`<hr part='separator' />` : null}
+          ${this.renderDeckSection(this.state.decklist.sideboard, !this.inlineSideboard ? 'section--sideboard' : null)}
         </div>
       </div>
     `;

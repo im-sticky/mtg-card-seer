@@ -4,7 +4,8 @@ export class SeerLoader extends LitElement {
   static get styles() {
     return css`
       [part="loader"] {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         position: relative;
         width: 80px;
         height: 80px;
@@ -12,7 +13,6 @@ export class SeerLoader extends LitElement {
 
       [part="loader-item"] {
         position: absolute;
-        top: 33px;
         width: 13px;
         height: 13px;
         border-radius: 50%;
