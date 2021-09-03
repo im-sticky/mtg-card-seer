@@ -57,7 +57,7 @@ document.querySelector('#selector').addEventListener('fetchCard', e => console.l
 }
 ```
 
-| Part | Matching Element | Description |
+| Part | Element | Description |
 |---|---|---|
 | link | \<a\> | The wrapping anchor for the child text and all component's elements. Image will be relative to this. |
 | container | \<div\> | Container element for all children elements that appear in card popup. Positioned based on mouse cursor and parent anchor. |
@@ -108,7 +108,7 @@ document.querySelector('#selector').addEventListener('fetchCard', e => console.l
 }
 ```
 
-| Part | Matching Element | Description |
+| Part | Element | Description |
 |---|---|---|
 | container | \<div\> | Container element for all inline images. |
 | image | \<img\> | The image that is retrieved from Scryfall. May be multiple images for double-faced cards. |
@@ -159,7 +159,7 @@ document.querySelector('#selector').addEventListener('fetchList', e => console.l
 }
 ```
 
-| Part | Matching Element | Description |
+| Part | Element | Description |
 |---|---|---|
 | container | \<div\> | Container that wraps entire component, holds `header` and `body` as direct children. |
 | header | \<div\> | Holds the title and export buttons displayed above the actual decklist. |
@@ -191,7 +191,7 @@ The \<seer-loader\> component is a simple loading animation that is used in some
 }
 ```
 
-| Part | Matching Element | Description |
+| Part | Element | Description |
 |---|---|---|
 | loader | \<div\> | Container that holds animated loading dots. |
 | loader-item | \<div\> | Individual animated loading dots. |

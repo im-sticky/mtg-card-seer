@@ -146,8 +146,8 @@ export class DeckList extends StateElement {
       [part="preview-container"] {
         position: relative;
         perspective: 1200px;
-        width: ${CARD_WIDTH};
-        height: ${CARD_HEIGHT};
+        width: ${CARD_WIDTH}px;
+        height: ${CARD_HEIGHT}px;
       }
 
       [part="preview"] {
