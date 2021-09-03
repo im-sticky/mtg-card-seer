@@ -1,7 +1,7 @@
 import {html, css} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
 import {Card} from 'helpers/card';
-import {CARD_WIDTH} from 'helpers/constants';
+import {CARD_WIDTH, CARD_HEIGHT, CARD_BORDER_ROUNDING} from 'helpers/constants';
 
 /**
  * Component for displaying an inline card image.
@@ -31,6 +31,7 @@ export class CardInline extends Card {
         display: inline-flex;
         flex-wrap: wrap;
         width: ${CARD_WIDTH}px;
+        height: ${CARD_HEIGHT}px;
         max-width: 100%;
       }
 
@@ -42,6 +43,7 @@ export class CardInline extends Card {
         display: block;
         max-width: 100%;
         height: 100%;
+        border-radius: ${CARD_BORDER_ROUNDING}px;
         animation: fadein 83ms ease-out;
       }
 

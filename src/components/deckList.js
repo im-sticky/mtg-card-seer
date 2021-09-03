@@ -13,6 +13,7 @@ import {
   MOBILE_WIDTH,
   KEY_CODES,
   EXPORT_MODE,
+  CARD_BORDER_ROUNDING,
 } from 'helpers/constants';
 
 const NOTIFICATION_TIMING = 3000;
@@ -142,7 +143,7 @@ export class DeckList extends StateElement {
         column-count: 3;
       }
 
-      .preview-perspective {
+      [part="preview-container"] {
         position: relative;
         perspective: 1200px;
         width: ${CARD_WIDTH};
@@ -150,14 +151,15 @@ export class DeckList extends StateElement {
       }
 
       [part="preview"] {
-        width: ${CARD_WIDTH};
-        height: ${CARD_HEIGHT};
+        width: 100%;
+        height: 100%;
         background-image: url(https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=0&type=card);
         background-size: 100% auto;
         background-repeat: no-repeat;
         position: relative;
         transition: transform 560ms ease-in-out;
         transform-style: preserve-3d;
+        border-radius: ${CARD_BORDER_ROUNDING}px;
       }
 
       [part="preview"].flipped {
@@ -165,11 +167,15 @@ export class DeckList extends StateElement {
       }
 
       [part="preview-image"] {
-        width: 100%;
-        height: 100%;
+        max-width: 100%;
         position: absolute;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
+      }
+
+      /* BUG: can't apply to backface or else it is hidden */
+      [part="preview-image"]:first-child {
+        border-radius: ${CARD_BORDER_ROUNDING}px;
       }
 
       [part="preview-image"] + [part="preview-image"] {
@@ -179,7 +185,7 @@ export class DeckList extends StateElement {
       [part="flip-preview"] {
         position: absolute;
         z-index: 10;
-        bottom: 0;
+        bottom: 1px;
         left: 50%;
         transform: translateX(-50%);
       }
@@ -562,15 +568,15 @@ export class DeckList extends StateElement {
 
         <div part='body'>
           ${!this.hidePreview ? html`
-            <div class='preview-perspective'>
+            <div part='preview-container'>
               <div part='preview' class='${classMap({'flipped': this.state.flipPreview})}'>
               ${this.state.preview ? this.state.preview.faces.map(x => html`
-              <img part='preview-image' src='${x.image}' alt='${x.name}' />
+                <img part='preview-image' src='${x.image}' alt='${x.name}' />
               `) : null}
               </div>
               ${this.state.preview?.faces.length > 1 ? html`
                 <button type='button' part='flip-preview' class='button button--small' @click=${() => this.dispatch(flipPreview())}>
-                  Turn Over
+                  Flip
                 </button>
               ` : null}
             </div>

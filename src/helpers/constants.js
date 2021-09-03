@@ -75,6 +75,9 @@ export const CARD_HEIGHT = 310;
 export const CARD_HEIGHT_MOBILE = CARD_HEIGHT * 0.8;
 export const MOBILE_WIDTH = 768;
 
+export const CARD_BORDER_ROUNDING = 9;
+export const CARD_BORDER_ROUNDING_MOBILE = 7;
+
 export const POINTER_TYPE_TOUCH = 'touch';
 
 export const KEY_CODES = {
