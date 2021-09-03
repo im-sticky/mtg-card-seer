@@ -50,7 +50,7 @@ export class DeckModel {
     };
 
     const toCard = card => {
-      return CardModel.fromApi(scryfallList.find(x => x.name.startsWith(card.name)), card.amount);
+      return CardModel.fromApi(scryfallList.find(x => x.name.match(new RegExp(`^${card.name}`, 'i'))), card.amount);
     };
 
     parserList.deck.forEach(card => {
@@ -61,7 +61,7 @@ export class DeckModel {
         cacheCard = CardCache.get(cacheKey);
       }
 
-      const scryfallCard = scryfallList.find(x => x.name.startsWith(card.name));
+      const scryfallCard = scryfallList.find(x => x.name.match(new RegExp(`^${card.name}`, 'i')));
 
       if (!scryfallCard && !cacheCard) {
         return;
