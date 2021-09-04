@@ -176,6 +176,7 @@ document.querySelector('#selector').addEventListener('fetchList', e => console.l
 | section-item | \<dd\> | List item holding `link`. |
 | link | \<a\> | External link to Scryfall page of card. |
 | separator | \<hr\> | Horizontal rule separating main body sections from sideboard. |
+| loader | \<seer-loader\> | Loader displayed while waiting for Scryfall API. |
 
 ## seer-loader
 

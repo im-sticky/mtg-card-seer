@@ -548,7 +548,7 @@ export class DeckList extends StateElement {
   render() {
     if (!this.state.fetched) {
       return html`
-        <seer-loader></seer-loader>
+        <seer-loader part='loader'></seer-loader>
       `;
     }
 
