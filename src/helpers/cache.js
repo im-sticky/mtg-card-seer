@@ -18,10 +18,13 @@ export class CardCache {
   /**
    * Retrieves a cached value based on a Scryfall search.
    * @param {Number} key Key to get from cache.
+   * @param {Boolean} clone If you want a new object reference and not the same reference that is stored in the cache.
    * @returns {any} The cached data.
    */
-  static get(key) {
-    return _cache.get(key);
+  static get(key, clone = false) {
+    let original = _cache.get(key);
+
+    return clone ? Object.assign(Object.create(Object.getPrototypeOf(original)), original) : original;
   }
 
   /**

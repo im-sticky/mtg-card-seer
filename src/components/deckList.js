@@ -338,7 +338,8 @@ export class DeckList extends StateElement {
       .concat(list.sideboard, list.commander, list.companion)
       .filter(x => !!x);
 
-    allCards = [...new Map(allCards.map(x => [x.name, x])).values()];
+    allCards = [...new Map(allCards.map(x => [x.name, x])).values()]
+      .filter(x => !CardCache.has(CardCache.createKey(x.name, x.set, x.collectors)));
 
     // Split into multiple chunks to avoid scryfall api limit
     const CHUNK_SIZE = 75;
@@ -349,7 +350,6 @@ export class DeckList extends StateElement {
       queries.push({
         identifiers: allCards
           .slice(CHUNK_SIZE * i, CHUNK_SIZE * (i + 1))
-          .filter(x => !CardCache.has(CardCache.createKey(x.name, x.set, x.collectors)))
           .map(x => {
             // Note: Scryfall doesn't seem to support all mtgo ids so avoid using those
             // Note: MTGA Dominaria set has a unique set code that Scryfall does not handle properly.
@@ -548,7 +548,7 @@ export class DeckList extends StateElement {
   render() {
     if (!this.state.fetched) {
       return html`
-        <seer-loader></seer-loader>
+        <seer-loader part='loader'></seer-loader>
       `;
     }
 
