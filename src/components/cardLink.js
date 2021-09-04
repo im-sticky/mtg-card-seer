@@ -9,6 +9,8 @@ import {
   CARD_HEIGHT_MOBILE,
   MOBILE_WIDTH,
   KEY_CODES,
+  CARD_BORDER_ROUNDING,
+  CARD_BORDER_ROUNDING_MOBILE,
 } from 'helpers/constants';
 import {isTouchEvent} from 'helpers/utility';
 
@@ -78,6 +80,7 @@ export class CardLink extends Card {
         display: block;
         max-width: 100%;
         height: 100%;
+        border-radius: ${CARD_BORDER_ROUNDING}px;
       }
 
       .card-link__container--wide [part="image"] {
@@ -126,6 +129,10 @@ export class CardLink extends Card {
 
         .card-link__container--wide {
           width: ${CARD_WIDTH_MOBILE * 2}px;
+        }
+
+        [part="image"] {
+          border-radius: ${CARD_BORDER_ROUNDING_MOBILE}px;
         }
       }
     `;
@@ -333,7 +340,7 @@ export class CardLink extends Card {
           ${this.displayFaces.map(face => html`<img part='image' src='${face.image}' alt='${face.name}' />`)}
           ${this.priceInfo ? html`
             <ul part='price-list'>
-              ${this.state.cardInfo.prices().map(price => price.price ? html`
+              ${this.state.cardInfo.prices.map(price => price.price ? html`
                 <li part='price-item'>
                   <a part='price-link' href='${price.url}' target='_blank' rel='nofollow noreferrer noopener'>
                     ${price.symbol}${price.price}

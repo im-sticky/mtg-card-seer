@@ -6,15 +6,19 @@ import {DOUBLE_SIDED_LAYOUTS} from 'helpers/constants';
 export class CardModel {
   /**
    * Initializes the model with all relevant card data.
+   * @param {String} name Complete name of card.
    * @param {Array} faces All card faces containing image URL and name.
    * @param {String} url URL to Scryfall page for specific card.
    * @param {Object} usd Contains all relevant price data in US dollars.
    * @param {Object} tix Contains all relevant price data in MTGO tix.
    * @param {Object} eur Contains all relevant price data in Euros.
+   * @param {Number} amount The number of cards that would be within a deck.
    */
-  constructor({faces, url, usd, tix, eur}) {
-    this.faces = faces || [];
+  constructor({name, faces = [], url, usd, tix, eur, amount = 1}) {
+    this.name = name;
+    this.faces = faces;
     this.url = url;
+    this.amount = amount;
     this.usd = new PriceModel({...usd});
     this.tix = new PriceModel({...tix});
     this.eur = new PriceModel({...eur});
@@ -23,14 +27,17 @@ export class CardModel {
   /**
    * Static method to be used for creating a new CardModel based on result from Scryfall API.
    * @param {Object} scryfall Scryfall API response object.
+   * @param {Number} amount The number of cards that would be within a deck.
    * @returns {CardModel} New CardModel with Scryfall data.
    */
-  static fromApi(scryfall) {
+  static fromApi(scryfall, amount = 1) {
     return new this({
+      name: scryfall.name,
+      url: scryfall.scryfall_uri,
+      amount,
       faces: DOUBLE_SIDED_LAYOUTS.includes(scryfall.layout) ?
         scryfall.card_faces.map(face => FaceModel.fromApi(face)) :
         [FaceModel.fromApi(scryfall)],
-      url: scryfall.scryfall_uri,
       usd: {
         price: scryfall.prices.usd,
         url: scryfall.purchase_uris.tcgplayer,
@@ -50,15 +57,31 @@ export class CardModel {
   }
 
   /**
-   * Constructs an array of all related price info.
+   * Getter that constructs an array of all related price info.
    * @returns {Array} All price info.
    */
-  prices() {
+  get prices() {
     return [
       this.usd,
       this.eur,
       this.tix,
     ];
+  }
+
+  /**
+   * Getter for retrieving type of card based on front face.
+   * @returns {String} Type of card.
+   */
+  get type() {
+    return this.faces[0].type;
+  }
+
+  /**
+   * Getter for front card face image.
+   * @returns {String} URL for front card face image.
+   */
+  get frontFace() {
+    return this.faces[0].image;
   }
 }
 
@@ -85,23 +108,26 @@ export class PriceModel {
 export class FaceModel {
   /**
    * initializes model properties.
-   * @param {String} name Name of the card.
-   * @param {String} image URL of card image.
+   * @param {String} name Name of the card face.
+   * @param {String} image URL of card face image.
+   * @param {String} type Typeline of the face.
    */
-  constructor({name, image}) {
+  constructor({name, image, type}) {
     this.name = name;
     this.image = image;
+    this.type = type;
   }
 
   /**
    * Static method to be used for creating a new FaceModel from a Scryfall API response object.
-   * @param {any} scryfall
-   * @returns {any}
+   * @param {Object} scryfall Scryfall API response object.
+   * @returns {FaceModel} New FaceModel object.
    */
   static fromApi(scryfall) {
     return new this({
       name: scryfall.name,
       image: scryfall.image_uris.normal,
+      type: scryfall.type_line,
     });
   }
 }

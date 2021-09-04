@@ -1,7 +1,7 @@
 import {html, css} from 'lit-element';
 import {classMap} from 'lit-html/directives/class-map';
 import {Card} from 'helpers/card';
-import {CARD_WIDTH} from 'helpers/constants';
+import {CARD_WIDTH, CARD_HEIGHT, CARD_BORDER_ROUNDING} from 'helpers/constants';
 
 /**
  * Component for displaying an inline card image.
@@ -17,10 +17,21 @@ export class CardInline extends Card {
 
   static get styles() {
     return css`
+      @keyframes fadein {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
       [part='container'] {
         display: inline-flex;
         flex-wrap: wrap;
         width: ${CARD_WIDTH}px;
+        height: ${CARD_HEIGHT}px;
         max-width: 100%;
       }
 
@@ -32,6 +43,8 @@ export class CardInline extends Card {
         display: block;
         max-width: 100%;
         height: 100%;
+        border-radius: ${CARD_BORDER_ROUNDING}px;
+        animation: fadein 83ms ease-out;
       }
 
       [part='container'].wide [part="image"] {
@@ -92,7 +105,7 @@ export class CardInline extends Card {
       ${this.displayFaces.map(face => html`<img part='image' src='${face.image}' alt='${face.name}' />`)}
       ${this.priceInfo ? html`
         <ul part='price-list'>
-          ${this.state.cardInfo.prices().map(price => price.price ? html`
+          ${this.state.cardInfo.prices.map(price => price.price ? html`
             <li part='price-item'>
               <a part='price-link' href='${price.url}' target='_blank' rel='nofollow noreferrer noopener'>
                 ${price.symbol}${price.price}
