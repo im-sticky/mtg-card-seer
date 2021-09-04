@@ -50,7 +50,19 @@ export class DeckModel {
     };
 
     const toCard = card => {
-      return CardModel.fromApi(scryfallList.find(x => x.name.match(new RegExp(`^${card.name}`, 'i'))), card.amount);
+      const cacheKey = CardCache.createKey(card.name, card.set, card.collectors);
+
+      if (CardCache.has(cacheKey)) {
+        const cacheCard = CardCache.get(cacheKey, true);
+
+        cacheCard.amount = card.amount;
+        return cacheCard;
+      }
+
+      const cardModel = CardModel.fromApi(scryfallList.find(x => x.name.match(new RegExp(`^${card.name}`, 'i'))), card.amount);
+
+      CardCache.set(cacheKey, cardModel);
+      return cardModel;
     };
 
     parserList.deck.forEach(card => {
@@ -58,7 +70,7 @@ export class DeckModel {
       let cacheCard;
 
       if (CardCache.has(cacheKey)) {
-        cacheCard = CardCache.get(cacheKey);
+        cacheCard = CardCache.get(cacheKey, true);
       }
 
       const scryfallCard = scryfallList.find(x => x.name.match(new RegExp(`^${card.name}`, 'i')));
@@ -77,6 +89,7 @@ export class DeckModel {
 
         if (matchAgainst.match(new RegExp(type, 'i'))) {
           if (cacheCard) {
+            cacheCard.amount = card.amount;
             sections[type].push(cacheCard);
 
             return true;
