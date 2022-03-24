@@ -35,22 +35,22 @@ export class CardModel {
       name: scryfall.name,
       url: scryfall.scryfall_uri,
       amount,
-      faces: DOUBLE_SIDED_LAYOUTS.includes(scryfall.layout) ?
-        scryfall.card_faces.map(face => FaceModel.fromApi(face)) :
-        [FaceModel.fromApi(scryfall)],
+      faces: DOUBLE_SIDED_LAYOUTS.includes(scryfall.layout)
+        ? scryfall.card_faces.map((face) => FaceModel.fromApi(face))
+        : [FaceModel.fromApi(scryfall)],
       usd: {
-        price: scryfall.prices.usd,
-        url: scryfall.purchase_uris.tcgplayer,
+        price: scryfall.prices?.usd,
+        url: scryfall.purchase_uris?.tcgplayer,
         symbol: '$',
       },
       eur: {
-        price: scryfall.prices.eur,
-        url: scryfall.purchase_uris.cardmarket,
+        price: scryfall.prices?.eur,
+        url: scryfall.purchase_uris?.cardmarket,
         symbol: '€',
       },
       tix: {
-        price: scryfall.prices.tix,
-        url: scryfall.purchase_uris.cardhoarder,
+        price: scryfall.prices?.tix,
+        url: scryfall.purchase_uris?.cardhoarder,
         symbol: 'TIX ',
       },
     });
@@ -61,11 +61,7 @@ export class CardModel {
    * @returns {Array} All price info.
    */
   get prices() {
-    return [
-      this.usd,
-      this.eur,
-      this.tix,
-    ];
+    return [this.usd, this.eur, this.tix];
   }
 
   /**
