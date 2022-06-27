@@ -129,6 +129,7 @@ The \<deck-list\> component is used for rendering a sorted list of cards given i
 
 | Attribute | Type | Description |
 |---|---|---|
+| Format | String | Format the deck is for. |
 | heading | String | Title of the decklist to be displayed. |
 | hideExport | Boolean | Hides the export buttons that are shown by default. |
 | hidePreview | Boolean | Hides the card image preview that is included by default. |
@@ -162,6 +163,7 @@ document.querySelector('#selector').addEventListener('fetchList', e => console.l
 | Part | Element | Description |
 |---|---|---|
 | container | \<div\> | Container that wraps entire component, holds `header` and `body` as direct children. |
+| format | \<span\> | The text format defined by the `format` attribute. |
 | header | \<div\> | Holds the title and export buttons displayed above the actual decklist. |
 | heading | \<h2\> | The text title defined by the `heading` attribute. |
 | export | \<button\> | A button for exporting the decklist. |

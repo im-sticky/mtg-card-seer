@@ -31,16 +31,19 @@ const [FLIP_PREVIEW, flipPreview] = createAction('FLIP_PREVIEW');
 export class DeckList extends StateElement {
   static get properties() {
     return {
-      hidePreview: {
-        type: Boolean,
-        attribute: 'hide-preview',
+      format: {
+        type: String,
+      },
+      heading: {
+        type: String,
       },
       hideExport: {
         type: Boolean,
         attribute: 'hide-export',
       },
-      heading: {
-        type: String,
+      hidePreview: {
+        type: Boolean,
+        attribute: 'hide-preview',
       },
       inlineSideboard: {
         type: Boolean,
@@ -85,13 +88,18 @@ export class DeckList extends StateElement {
 
       [part="header"] {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         margin-bottom: 1rem;
       }
 
       [part="heading"] {
         margin: 0;
         padding-right: 1rem;
+      }
+
+      [part="format"] {
+        font-size: 80%;
+        font-style: italic;
       }
 
       .button {
@@ -557,6 +565,7 @@ export class DeckList extends StateElement {
         ${this.heading || !this.hideExport ? html`
           <div part='header'>
             ${this.heading ? html`<h2 part='heading'>${this.heading}</h2>` : null}
+            ${this.format ? html`<span part='format'>${this.format}</span>` : null}
             ${!this.hideExport ? html`
               ${this.state.exportNotification ? html`
                 <p part='export-notification'>${this.state.exportNotification}</p>
