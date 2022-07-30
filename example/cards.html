@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <meta lang="en-ca">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Card Examples | MTG Card Seer</title>
+    <link href="/blueprint.min.css" rel="stylesheet" />
+    <style>
+      html, body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .card-links li {
+        margin-bottom: 16px;
+      }
+
+      .styled::part(link) {
+        color: red;
+        text-decoration: none;
+      }
+
+      .styled::part(container) {
+        width: 88px;
+        height: 123px;
+      }
+
+      .styled::part(image) {
+        transform: rotate(90deg);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div bp="container grid">
+      <div bp="6">
+        <ul class="card-links">
+          <li>
+            <card-link id="seer">Viscera Seer</card-link>
+          </li>
+          <li>
+            <card-link id="rename" name="lightning bolt">bolt</card-link>
+          </li>
+          <li>
+            <card-link class="styled" name="lightning bolt">bolt</card-link>
+          </li>
+          <li>
+            <card-link>Claim // Fame</card-link>
+          </li>
+          <li>
+            <card-link>Skyclave Cleric // Skyclave Basilica</card-link>
+          </li>
+          <li>
+            <card-link face="2">Insectile Aberration</card-link>
+          </li>
+          <li>
+            <card-link set="eld" collector="271">Oko, Thief of Crowns</card-link>
+          </li>
+          <li>
+            <card-link price-info>Arid Mesa</card-link>
+          </li>
+          <li>
+            <card-link>No results</card-link>
+          </li>
+        </ul>
+      </div>
+
+      <div bp="6">
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates nihil quam labore,
+          asperiores corporis voluptas necessitatibus aliquam rem <card-link>The great henge</card-link> eum saepe.
+          Officia, soluta accusantium! Ea unde nisi aspernatur. Fuga, est mollitia?
+        </p>
+      </div>
+
+      <div bp="4">
+        <card-inline>Birthing Pod</card-inline>
+      </div>
+
+      <div bp="4">
+        <card-inline static set="SHM">Kitchen Finks</card-inline>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+      setTimeout(() => {
+        document.querySelector('#rename').setAttribute('name', 'Demon Bolt');
+        console.log('update name prop from "lightning bolt" to "Demon Bolt"');
+      }, 2000);
+
+      document.querySelector('#seer').addEventListener('fetchCard', e => console.log('fetched card', e));
+    </script>
+  </body>
+</html>

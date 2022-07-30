@@ -19,6 +19,9 @@ module.exports = merge(common, {
       patterns: [
         {
           from: 'example/*.(txt|dek)',
+        },
+        {
+          from: 'node_modules/blueprint-css/dist/blueprint.min.css'
         }
       ]
     }),
@@ -27,7 +30,12 @@ module.exports = merge(common, {
       template: 'example/index.html',
     }),
     new HtmlWebpackPlugin({
-      title: 'MTG Card Seer',
+      title: 'Cards Example | MTG Card Seer',
+      template: 'example/cards.html',
+      filename: 'cards.html',
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Decks Example | MTG Card Seer',
       template: 'example/decks.html',
       filename: 'decks.html',
     }),

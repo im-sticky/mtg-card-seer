@@ -27,6 +27,7 @@
   "homepage": "https://github.com/im-sticky/mtg-card-seer#readme",
   "dependencies": {
     "imurmurhash": "^0.1.4",
+    "lit": "^2.2.8",
     "lit-element": "^2.5.1",
     "mtg-decklist-parser": "^2.0.0"
   },
@@ -35,6 +36,7 @@
     "@babel/preset-env": "^7.14.9",
     "babel-loader": "^8.2.2",
     "babel-plugin-template-html-minifier": "^4.1.0",
+    "blueprint-css": "^3.0.0-beta.0",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "copy-webpack-plugin": "^9.0.1",
     "eslint": "^7.32.0",

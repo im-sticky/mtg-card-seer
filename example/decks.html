@@ -3,7 +3,8 @@
     <meta lang="en-ca">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>MTG Card Seer</title>
+    <title>Deck Examples | MTG Card Seer</title>
+    <link href="/blueprint.min.css" rel="stylesheet" />
     <style>
       html, body {
         font-family: Arial, Helvetica, sans-serif;
@@ -15,13 +16,6 @@
         box-sizing: border-box;
       }
 
-      .test-content {
-        display: flex;
-        flex-direction: column;
-        padding: 24px;
-        height: 100%;
-      }
-
       deck-list::part(container) {
         margin: 48px auto;
       }
@@ -29,7 +23,7 @@
   </head>
 
   <body>
-    <div class="test-content">
+    <div bp="grid 12">
       <deck-list inline-sideboard format="Modern">
 Deck
 2 Jace, the Mind Sculptor

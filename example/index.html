@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>MTG Card Seer</title>
+    <link href="/blueprint.min.css" rel="stylesheet" />
     <style>
       html, body {
         font-family: Arial, Helvetica, sans-serif;
@@ -15,81 +16,18 @@
         box-sizing: border-box;
       }
 
-      .test-content {
-        display: flex;
-        flex-direction: column;
-        padding: 24px;
-        height: 100%;
-      }
-
-      .test-content > card-link {
+      ul li {
         margin-bottom: 16px;
-      }
-
-      .styled::part(link) {
-        color: red;
-        text-decoration: none;
-      }
-
-      .styled::part(container) {
-        width: 88px;
-        height: 123px;
-      }
-
-      .styled::part(image) {
-        transform: rotate(90deg);
-      }
-
-      .right {
-        margin-left: auto;
-      }
-
-      .bottom {
-        margin-top: auto;
-      }
-
-      .flex {
-        display: flex;
-      }
-
-      card-inline {
-        margin: 0 8px;
       }
     </style>
   </head>
 
   <body>
-    <div class="test-content">
-      <card-link id="seer">Viscera Seer</card-link>
-      <card-link id="rename" name="lightning bolt">bolt</card-link>
-      <card-link class="styled" name="lightning bolt">bolt</card-link>
-      <card-link>Claim // Fame</card-link>
-      <card-link>Skyclave Cleric // Skyclave Basilica</card-link>
-      <card-link face="2">Insectile Aberration</card-link>
-      <card-link set="eld" collector="271">Oko, Thief of Crowns</card-link>
-      <card-link price-info>Arid Mesa</card-link>
-      <card-link>No results</card-link>
-
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates nihil quam labore, asperiores corporis voluptas necessitatibus aliquam rem <card-link>The great henge</card-link> eum saepe. Officia, soluta accusantium! Ea unde nisi aspernatur. Fuga, est mollitia?</p>
-
-      <div class="flex">
-        <card-inline>Birthing Pod</card-inline>
-        <card-inline static set="SHM">Kitchen Finks</card-inline>
-      </div>
-
-      <card-link class="right">Stoneforge Mystic</card-link>
-      <card-link class="right" set="wwk">Stoneforge Mystic</card-link>
-      <card-link class="bottom right">Batterskull</card-link>
+    <div bp="container grid 12">
+      <ul>
+        <li><a href="/cards.html">Card Examples</a></li>
+        <li><a href="/decks.html">Deck Examples</a></li>
+      </ul>
     </div>
-
-
-    <script type="text/javascript">
-      setTimeout(() => {
-        document.querySelector('#rename').setAttribute('name', 'Demon Bolt');
-        console.log('update name prop from "lightning bolt" to "Demon Bolt"');
-      }, 2000);
-
-      document.querySelector('#seer').addEventListener('fetchCard', e => console.log('fetched card', e));
-    </script>
   </body>
 </html>
